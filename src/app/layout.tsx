@@ -22,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${roboto.variable} font-sans antialiased`}>
+      <body className={`${roboto.variable} font-sans antialiased`} suppressHydrationWarning>
         <ProfileProvider>
           {children}
           <Toaster />
