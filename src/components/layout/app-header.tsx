@@ -13,13 +13,13 @@ export function AppHeader() {
 
   const handleLogout = () => {
     logout();
-    router.push('/'); // Changed from '/login' to '/'
+    router.push('/'); 
   };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
-        <Link href={profile ? "/dashboard" : "/"} className="mr-6 flex items-center space-x-2">
+        <Link href="/" className="mr-6 flex items-center space-x-2">
           <CreditCard className="h-6 w-6 text-primary" />
           <span className="font-bold sm:inline-block">
             Cardify
@@ -50,3 +50,4 @@ export function AppHeader() {
     </header>
   );
 }
+
