@@ -27,51 +27,57 @@ export default function UserCardPage() {
   } = useProfile();
 
   // Local state for this page
-  // pageDisplayProfile holds the profile that this page has decided it should render,
-  // either from context (for own live card) or fetched (for external card).
   const [pageDisplayProfile, setPageDisplayProfile] = useState<UserProfile | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
-  // isViewingOwnLiveCard determines if we're showing the logged-in user's card with their live editor state.
   const [isViewingOwnLiveCard, setIsViewingOwnLiveCard] = useState(false);
 
-  // Refs for context patching (only if NOT isViewingOwnLiveCard, i.e., for external cards)
+  // Refs for context patching
   const isActiveContextPatch = useRef(false);
   const originalContextProfileBeforePatch = useRef<UserProfile | null | undefined>(undefined);
   const originalThemeIdBeforePatch = useRef<string | undefined>(undefined);
 
-  // Step 1: Determine behavior based on paramUserId and contextProfile
+  // Step 1: Determine behavior: are we viewing our own live card, the demo card, or another external card?
   useEffect(() => {
     setPageLoading(true);
-    if (paramUserId) {
-      if (contextProfile && contextProfile.userId === paramUserId) {
-        // Case 1: Viewing the currently logged-in user's card.
-        // Use their live data from the global context. No fetching, no patching needed here.
-        setPageDisplayProfile(contextProfile); // For potential local use, though CardPreview uses context
-        setIsViewingOwnLiveCard(true);
-        setPageLoading(false);
-      } else {
-        // Case 2: Viewing someone else's card, or no one is logged in that matches paramUserId.
-        // Fetch data for paramUserId.
-        setIsViewingOwnLiveCard(false);
-        const fetchProfileById = async (id: string) => {
-          await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
-          if (id === initialProfileData.userId) { // Mock "database" lookup
-            setPageDisplayProfile(initialProfileData);
-          } else {
-            setPageDisplayProfile(null); // User not found
-          }
-          setPageLoading(false);
-        };
-        fetchProfileById(paramUserId);
-      }
-    } else {
-      setPageDisplayProfile(null); // No User ID in params
+    if (!paramUserId) {
+      setPageDisplayProfile(null);
       setIsViewingOwnLiveCard(false);
       setPageLoading(false);
+      return;
     }
-  }, [paramUserId, contextProfile]); // Re-run if paramUserId changes or logged-in user (contextProfile) changes
 
-  // Step 2: If displaying an external card (NOT own live card), patch the global context.
+    const isDemoCardRoute = paramUserId === initialProfileData.userId;
+    // "Own live card" means the URL matches the logged-in user, AND it's NOT the special demo card ID.
+    const ownLiveCard = !isDemoCardRoute && contextProfile && contextProfile.userId === paramUserId;
+
+    setIsViewingOwnLiveCard(ownLiveCard);
+
+    if (ownLiveCard) {
+      // Viewing own live card (and it's not the demo card ID '12345')
+      // Use live data from context; CardPreview will pick this up.
+      // No fetching or setting pageDisplayProfile needed here as CardPreview uses context directly.
+      setPageLoading(false);
+    } else {
+      // Viewing an external card OR the special demo card ID '12345'.
+      // Fetch data for the paramUserId.
+      const fetchProfileData = async (id: string) => {
+        await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
+        if (id === initialProfileData.userId) {
+          // This covers the demo card ID '12345', ensuring it always loads initialProfileData.
+          setPageDisplayProfile(initialProfileData);
+        } else {
+          // For any other ID, it's considered "not found" in this demo app.
+          // console.warn(`Profile for user ID ${id} not found. This app primarily knows about ID ${initialProfileData.userId}.`);
+          setPageDisplayProfile(null);
+        }
+        setPageLoading(false);
+      };
+      fetchProfileData(paramUserId);
+    }
+  }, [paramUserId, contextProfile]);
+
+
+  // Step 2: If displaying an external card (or the demo card), patch the global context.
   // CardPreview component will pick this patched context up via useProfile().
   useEffect(() => {
     if (isViewingOwnLiveCard) {
@@ -90,27 +96,28 @@ export default function UserCardPage() {
       return; // No context patching needed for own live card.
     }
 
-    // Logic for external cards (isViewingOwnLiveCard is false)
+    // Logic for external cards OR the demo card (isViewingOwnLiveCard is false)
     if (pageDisplayProfile) {
-      // We have a profile for an external card. We need to patch the global context
-      // so CardPreview (which uses useProfile) displays this external card's data.
+      // We have a profile to display (either fetched external or initialProfileData for demo).
+      // We need to patch the global context so CardPreview displays this card's data.
       const needsPatch =
         contextProfile?.userId !== pageDisplayProfile.userId ||
+        contextProfile?.theme !== pageDisplayProfile.theme || // Check all relevant fields
         contextCurrentThemeId !== pageDisplayProfile.theme;
 
       if (needsPatch) {
         if (!isActiveContextPatch.current) {
-          // This is the first time we're patching for this external card (or after a restoration)
+          // This is the first time we're patching for this external/demo card
           originalContextProfileBeforePatch.current = contextProfile ? { ...contextProfile } : null;
           originalThemeIdBeforePatch.current = contextCurrentThemeId;
-          isActiveContextPatch.current = true; // Mark that we are now managing the context for an external card
+          isActiveContextPatch.current = true;
         }
         // Perform the patch
         setContextProfile(pageDisplayProfile);
         setContextCurrentThemeId(pageDisplayProfile.theme);
       }
     } else if (isActiveContextPatch.current) {
-      // External card profile is null (e.g., not found), but a patch was active. Restore context.
+      // External/demo card profile is null (e.g., not found), but a patch was active. Restore context.
       if (originalContextProfileBeforePatch.current !== undefined) {
         setContextProfile(originalContextProfileBeforePatch.current);
       }
@@ -125,7 +132,7 @@ export default function UserCardPage() {
     // Cleanup function for this effect instance
     return () => {
       if (isActiveContextPatch.current) {
-        // If the component unmounts or dependencies change while a patch for an external card was active, restore.
+        // If the component unmounts or dependencies change while a patch for an external/demo card was active, restore.
         if (originalContextProfileBeforePatch.current !== undefined) {
           setContextProfile(originalContextProfileBeforePatch.current);
         }
@@ -140,14 +147,14 @@ export default function UserCardPage() {
   }, [
     isViewingOwnLiveCard,
     pageDisplayProfile,
-    contextProfile, // dependency for `needsPatch` and storing original
-    contextCurrentThemeId, // dependency for `needsPatch` and storing original
+    contextProfile,
+    contextCurrentThemeId,
     setContextProfile,
     setContextCurrentThemeId,
   ]);
 
-  // Loading state considers page-specific loading and global context loading if relevant
-  if (pageLoading || (contextLoading && !isViewingOwnLiveCard && !contextProfile)) {
+
+  if (pageLoading || (contextLoading && !isViewingOwnLiveCard && !pageDisplayProfile && !contextProfile)) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700 p-4 text-white">
         <Loader2 className="h-16 w-16 animate-spin text-accent" />
@@ -156,9 +163,8 @@ export default function UserCardPage() {
     );
   }
 
-  // If pageDisplayProfile is null AND we are not viewing our own live card (which would mean contextProfile is also null)
-  // This typically means an external card was not found.
-  if (!pageDisplayProfile && !isViewingOwnLiveCard) {
+  // If we are not viewing our own live card, and pageDisplayProfile is null, it means card not found.
+  if (!isViewingOwnLiveCard && !pageDisplayProfile) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700 p-4 text-white">
         <h1 className="mb-4 text-4xl font-bold">Card Not Found</h1>
@@ -170,16 +176,15 @@ export default function UserCardPage() {
     );
   }
   
-  // If isViewingOwnLiveCard is true, CardPreview uses the live global context.
-  // If displaying an external card (isViewingOwnLiveCard is false) and pageDisplayProfile exists,
-  // the global context has been patched to pageDisplayProfile, and CardPreview uses that.
-  // If pageDisplayProfile is null but isViewingOwnLiveCard is true, it means contextProfile is null,
-  // CardPreview will handle this by showing its "no profile" state.
+  // CardPreview always uses useProfile() to get its data.
+  // - If isViewingOwnLiveCard is true, context is already live.
+  // - If isViewingOwnLiveCard is false (external or demo card), context has been patched by the effect above.
+  // - If contextProfile is null (e.g. no user logged in and viewing own non-existent card), CardPreview shows its "no profile" state.
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-100 to-slate-300 p-4 dark:from-slate-800 dark:to-slate-900 md:p-8">
       <div className="w-full max-w-lg">
-         <CardPreview /> {/* CardPreview always uses useProfile() to get its data */}
+         <CardPreview />
          <div className="mt-8 text-center">
           <Link href="/" passHref>
             <Button variant="outline" className="bg-background/80">
