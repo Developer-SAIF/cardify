@@ -41,7 +41,7 @@ export function AppHeader() {
               </Button>
             </>
           ) : (
-            <Button variant="default" size="sm" onClick={() => router.push('/login')}>
+            <Button variant="default" size="sm" onClick={() => router.push('/')}>
               Login
             </Button>
           )}
@@ -50,4 +50,3 @@ export function AppHeader() {
     </header>
   );
 }
-

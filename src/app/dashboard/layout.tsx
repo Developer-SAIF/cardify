@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect } from 'react';
@@ -16,7 +17,7 @@ export default function DashboardLayout({
 
   useEffect(() => {
     if (!loading && !profile) {
-      router.replace('/login');
+      router.replace('/'); // Redirect to the new root/login page
     }
   }, [profile, loading, router]);
 

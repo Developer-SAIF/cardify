@@ -1,10 +1,12 @@
+
 "use client";
+
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProfile } from '@/contexts/profile-context';
-import { Loader2 } from 'lucide-react';
-import { AppHeader } from '@/components/layout/app-header';
-import { Button } from '@/components/ui/button';
+import { LoginForm } from '@/components/auth/login-form';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CreditCard, Loader2 } from 'lucide-react';
 
 export default function HomePage() {
   const router = useRouter();
@@ -14,9 +16,6 @@ export default function HomePage() {
     if (!loading) {
       if (profile) {
         router.replace('/dashboard');
-      } else {
-        // Stay on landing page or redirect to login, for now stay.
-        // router.replace('/login'); 
       }
     }
   }, [profile, loading, router]);
@@ -30,25 +29,28 @@ export default function HomePage() {
     );
   }
 
+  // If user is not logged in, show the login form
   return (
-    <div className="flex min-h-screen flex-col">
-      <AppHeader />
-      <main className="flex flex-1 flex-col items-center justify-center p-6 text-center">
-        <h1 className="mb-6 text-5xl font-bold tracking-tight text-primary">Welcome to Cardify</h1>
-        <p className="mb-8 max-w-xl text-lg text-foreground/80">
-          Your modern solution for digital business cards. Create, customize, and share your professional identity with ease.
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+      <div className="mb-8 flex flex-col items-center text-center">
+          <CreditCard className="h-12 w-12 text-primary mb-4" />
+          <h1 className="text-4xl font-bold tracking-tight text-primary">Cardify</h1>
+          <p className="text-muted-foreground">Your Digital Business Card Solution</p>
+      </div>
+      <Card className="w-full max-w-md shadow-xl">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Access Your Cardify</CardTitle>
+          <CardDescription>Enter your unique User ID to access your dashboard or view a demo.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <LoginForm />
+        </CardContent>
+      </Card>
+       <p className="mt-6 text-center text-sm text-muted-foreground">
+          This is a demo. Try User ID: <strong>12345</strong> to log in.
+          <br />
+          Or, <a href="/card/12345" className="underline hover:text-primary">view the demo card directly</a>.
         </p>
-        <div className="space-x-4">
-          <Button size="lg" onClick={() => router.push('/login')}>Get Started</Button>
-          <Button size="lg" variant="outline" onClick={() => router.push('/card/12345')}>View Demo Card</Button>
-        </div>
-        <p className="mt-10 text-sm text-muted-foreground">
-          (For demo purposes, login with User ID: <strong>12345</strong>)
-        </p>
-      </main>
-      <footer className="py-6 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} Cardify. All rights reserved.
-      </footer>
     </div>
   );
 }
