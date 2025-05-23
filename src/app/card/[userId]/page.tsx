@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { CardPreview } from '@/components/dashboard/card-preview';
 import { useProfile } from '@/contexts/profile-context';
 import type { UserProfile } from '@/types';
-import { initialProfileData } from '@/types'; // Represents the "database" for demo
+import { initialProfileData } from '@/types';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -17,7 +17,6 @@ export default function UserCardPage() {
   const { userId: paramUserIdString } = params;
   const paramUserId = Array.isArray(paramUserIdString) ? paramUserIdString[0] : paramUserIdString;
 
-  // Global context
   const {
     profile: contextProfile,
     loading: contextLoading,
@@ -26,62 +25,53 @@ export default function UserCardPage() {
     setCurrentThemeId: setContextCurrentThemeId,
   } = useProfile();
 
-  // Local state for this page
-  const [pageDisplayProfile, setPageDisplayProfile] = useState<UserProfile | null>(null);
+  const [cardProfile, setCardProfile] = useState<UserProfile | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
-  const [isViewingOwnLiveCard, setIsViewingOwnLiveCard] = useState(false);
 
   // Refs for context patching
   const isActiveContextPatch = useRef(false);
   const originalContextProfileBeforePatch = useRef<UserProfile | null | undefined>(undefined);
   const originalThemeIdBeforePatch = useRef<string | undefined>(undefined);
 
-  // Step 1: Determine behavior: are we viewing our own live card, the demo card, or another external card?
+  // Step 1: Fetch profile for the card page if it's not the logged-in user's live view
   useEffect(() => {
     setPageLoading(true);
     if (!paramUserId) {
-      setPageDisplayProfile(null);
-      setIsViewingOwnLiveCard(false);
+      setCardProfile(null);
       setPageLoading(false);
       return;
     }
 
-    const isDemoCardRoute = paramUserId === initialProfileData.userId;
-    // "Own live card" means the URL matches the logged-in user, AND it's NOT the special demo card ID.
-    const ownLiveCard = !isDemoCardRoute && contextProfile && contextProfile.userId === paramUserId;
-
-    setIsViewingOwnLiveCard(ownLiveCard);
-
-    if (ownLiveCard) {
-      // Viewing own live card (and it's not the demo card ID '12345')
-      // Use live data from context; CardPreview will pick this up.
-      // No fetching or setting pageDisplayProfile needed here as CardPreview uses context directly.
+    // If paramUserId matches the logged-in user's ID, we will use live context.
+    // Otherwise, fetch.
+    if (contextProfile && contextProfile.userId === paramUserId) {
+      // We are viewing our own card. Rely on live context.
+      // No specific cardProfile fetching needed here. CardPreview will use global context.
+      // The patching logic in the next effect will handle if context needs to reflect this specific card.
+      // If it's our own card, the context should already be "live" and no patch needed.
+      setCardProfile(contextProfile); // Set cardProfile for consistency for the loading/not found logic
       setPageLoading(false);
     } else {
-      // Viewing an external card OR the special demo card ID '12345'.
-      // Fetch data for the paramUserId.
+      // Fetch data for an external card or the demo card.
       const fetchProfileData = async (id: string) => {
         await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
         if (id === initialProfileData.userId) {
-          // This covers the demo card ID '12345', ensuring it always loads initialProfileData.
-          setPageDisplayProfile(initialProfileData);
+          setCardProfile(initialProfileData);
         } else {
-          // For any other ID, it's considered "not found" in this demo app.
-          // console.warn(`Profile for user ID ${id} not found. This app primarily knows about ID ${initialProfileData.userId}.`);
-          setPageDisplayProfile(null);
+          setCardProfile(null);
         }
         setPageLoading(false);
       };
       fetchProfileData(paramUserId);
     }
-  }, [paramUserId, contextProfile]);
+  }, [paramUserId, contextProfile]); // Only re-run if paramUserId or contextProfile (for ID check) changes.
 
-
-  // Step 2: If displaying an external card (or the demo card), patch the global context.
-  // CardPreview component will pick this patched context up via useProfile().
+  // Step 2: Patch global context if displaying an external/demo card; restore on cleanup.
   useEffect(() => {
-    if (isViewingOwnLiveCard) {
-      // If we switched to viewing our own live card, and a patch was active, ensure it's cleaned up.
+    const isViewingOwnCard = contextProfile && contextProfile.userId === paramUserId;
+
+    if (isViewingOwnCard) {
+      // Viewing own card: ensure any patch is cleaned up if it was active.
       if (isActiveContextPatch.current) {
         if (originalContextProfileBeforePatch.current !== undefined) {
           setContextProfile(originalContextProfileBeforePatch.current);
@@ -93,31 +83,30 @@ export default function UserCardPage() {
         originalContextProfileBeforePatch.current = undefined;
         originalThemeIdBeforePatch.current = undefined;
       }
-      return; // No context patching needed for own live card.
+      return; // No context patching needed.
     }
 
-    // Logic for external cards OR the demo card (isViewingOwnLiveCard is false)
-    if (pageDisplayProfile) {
-      // We have a profile to display (either fetched external or initialProfileData for demo).
-      // We need to patch the global context so CardPreview displays this card's data.
+    // Viewing an external or demo card:
+    if (cardProfile) { // cardProfile is the fetched/initial data
       const needsPatch =
-        contextProfile?.userId !== pageDisplayProfile.userId ||
-        contextProfile?.theme !== pageDisplayProfile.theme || // Check all relevant fields
-        contextCurrentThemeId !== pageDisplayProfile.theme;
+        contextProfile?.userId !== cardProfile.userId ||
+        contextProfile?.theme !== cardProfile.theme ||
+        contextCurrentThemeId !== cardProfile.theme;
 
       if (needsPatch) {
         if (!isActiveContextPatch.current) {
-          // This is the first time we're patching for this external/demo card
+          // Start of a patch: store original context
           originalContextProfileBeforePatch.current = contextProfile ? { ...contextProfile } : null;
           originalThemeIdBeforePatch.current = contextCurrentThemeId;
           isActiveContextPatch.current = true;
         }
-        // Perform the patch
-        setContextProfile(pageDisplayProfile);
-        setContextCurrentThemeId(pageDisplayProfile.theme);
+        // Apply patch
+        setContextProfile(cardProfile);
+        setCurrentThemeId(cardProfile.theme);
       }
+      // If no patch is needed (context already matches cardProfile), do nothing.
     } else if (isActiveContextPatch.current) {
-      // External/demo card profile is null (e.g., not found), but a patch was active. Restore context.
+      // cardProfile is null (e.g., not found), but a patch was active. Restore.
       if (originalContextProfileBeforePatch.current !== undefined) {
         setContextProfile(originalContextProfileBeforePatch.current);
       }
@@ -129,10 +118,9 @@ export default function UserCardPage() {
       originalThemeIdBeforePatch.current = undefined;
     }
 
-    // Cleanup function for this effect instance
     return () => {
+      // Cleanup: If a patch was active when component unmounts or dependencies change
       if (isActiveContextPatch.current) {
-        // If the component unmounts or dependencies change while a patch for an external/demo card was active, restore.
         if (originalContextProfileBeforePatch.current !== undefined) {
           setContextProfile(originalContextProfileBeforePatch.current);
         }
@@ -145,16 +133,19 @@ export default function UserCardPage() {
       }
     };
   }, [
-    isViewingOwnLiveCard,
-    pageDisplayProfile,
-    contextProfile,
-    contextCurrentThemeId,
+    cardProfile, // Data for the card being viewed on this page
+    contextProfile, // Global context profile
+    contextCurrentThemeId, // Global context theme
+    paramUserId, // From URL
     setContextProfile,
     setContextCurrentThemeId,
   ]);
 
+  // Loading state logic
+  const isLoading = pageLoading || (contextLoading && (!cardProfile || (contextProfile && contextProfile.userId !== paramUserId && !cardProfile)));
 
-  if (pageLoading || (contextLoading && !isViewingOwnLiveCard && !pageDisplayProfile && !contextProfile)) {
+
+  if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700 p-4 text-white">
         <Loader2 className="h-16 w-16 animate-spin text-accent" />
@@ -163,8 +154,9 @@ export default function UserCardPage() {
     );
   }
 
-  // If we are not viewing our own live card, and pageDisplayProfile is null, it means card not found.
-  if (!isViewingOwnLiveCard && !pageDisplayProfile) {
+  // Not viewing own card AND (cardProfile is null or contextProfile means nothing is loaded for this paramUserId)
+  const isOwnCard = contextProfile && contextProfile.userId === paramUserId;
+  if (!isOwnCard && !cardProfile) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700 p-4 text-white">
         <h1 className="mb-4 text-4xl font-bold">Card Not Found</h1>
@@ -175,17 +167,12 @@ export default function UserCardPage() {
       </div>
     );
   }
-  
-  // CardPreview always uses useProfile() to get its data.
-  // - If isViewingOwnLiveCard is true, context is already live.
-  // - If isViewingOwnLiveCard is false (external or demo card), context has been patched by the effect above.
-  // - If contextProfile is null (e.g. no user logged in and viewing own non-existent card), CardPreview shows its "no profile" state.
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-100 to-slate-300 p-4 dark:from-slate-800 dark:to-slate-900 md:p-8">
       <div className="w-full max-w-lg">
-         <CardPreview />
-         <div className="mt-8 text-center">
+        <CardPreview />
+        <div className="mt-8 text-center">
           <Link href="/" passHref>
             <Button variant="outline" className="bg-background/80">
               <ArrowLeft className="mr-2 h-4 w-4" /> Create Your Own Cardify Card
