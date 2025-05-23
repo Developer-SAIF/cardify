@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from 'next/image';
@@ -33,7 +34,9 @@ export function CardPreview() {
     );
   }
   
-  const theme = getThemeById(currentThemeId || profile.theme);
+  // Use currentThemeId directly as it's the live selected theme.
+  // currentThemeId is guaranteed to be a string by ProfileContext.
+  const theme = getThemeById(currentThemeId); 
   const cardThemeClass = theme.gradientClass;
 
   return (
@@ -201,3 +204,4 @@ function CardPreviewSkeleton() {
     </div>
   );
 }
+
