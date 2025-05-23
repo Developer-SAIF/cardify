@@ -13,7 +13,7 @@ export function AppHeader() {
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push('/'); // Changed from '/login' to '/'
   };
 
   return (
