@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { UserProfile } from '@/types';
@@ -38,11 +39,12 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
     setLoading(false);
   }, []);
   
-  useEffect(() => {
-    if (profile) {
-      setCurrentThemeId(profile.theme);
-    }
-  }, [profile?.theme]);
+  // Removed useEffect that synced currentThemeId from profile.theme
+  // This was causing a loop with UserCardPage's context patching.
+  // setCurrentThemeId is already called appropriately:
+  // - on login
+  // - by ThemeSelector
+  // - by UserCardPage when it patches/restores context
 
 
   const login = async (userId: string): Promise<boolean> => {
@@ -80,3 +82,4 @@ export const useProfile = () => {
   }
   return context;
 };
+
