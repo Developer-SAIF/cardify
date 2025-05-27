@@ -23,11 +23,16 @@ export default async function handler(
     if (userRows.length > 0) {
       const user = userRows[0];
 
+      user.showHeadline = Boolean(user.showHeadline);
+      user.showProfession = Boolean(user.showProfession);
+      user.showCompany = Boolean(user.showCompany);
+      user.showLocation = Boolean(user.showLocation);
+      user.showContactEmail = Boolean(user.showContactEmail);
+      user.showContactPhone = Boolean(user.showContactPhone);
+
       // Parse JSON fields and apply defaults if needed
       user.skills = user.skills ? user.skills : DEFAULT_SKILLS;
-      user.education = user.education
-        ? user.education
-        : DEFAULT_EDUCATION;
+      user.education = user.education ? user.education : DEFAULT_EDUCATION;
       user.links = user.links ? user.links : DEFAULT_LINKS;
 
       res.status(200).json(user);
@@ -35,7 +40,6 @@ export default async function handler(
       res.status(404).json({ error: "User not found" });
     }
   } else if (req.method === "POST" || req.method === "PUT") {
-    // Update or create user profile
     const data = req.body;
 
     // Stringify JSON fields before saving
@@ -43,8 +47,17 @@ export default async function handler(
     if (data.education) data.education = JSON.stringify(data.education);
     if (data.links) data.links = JSON.stringify(data.links);
 
-    await db.query(`REPLACE INTO user_profiles SET ?`, [data]);
-    res.status(200).json({ success: true });
+    try {
+      await db.query(`REPLACE INTO user_profiles SET ?`, [data]);
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error("DB error occurred:", { error });
+
+      const errorMessage =
+        error instanceof Error ? error.message : "An unexpected error occurred";
+
+      res.status(500).json({ success: false, error: errorMessage });
+    }
   } else {
     res.status(405).end();
   }

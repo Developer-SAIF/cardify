@@ -50,7 +50,11 @@ export function ImageUploader({
       const imgbbUrl = await uploadToImgbb(file);
       if (imgbbUrl) {
         setPreviewUrl(imgbbUrl);
-        form.setValue(fieldName, imgbbUrl);
+        form.setValue(fieldName, imgbbUrl, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+        await form.trigger(fieldName); // Ensure form state is updated
       } else {
         alert("Image upload failed. Please try again.");
       }
@@ -67,7 +71,9 @@ export function ImageUploader({
       body: formData,
     });
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error("Failed to upload image:", res.statusText);
+      return null;}
     const data = await res.json();
     return data.data?.url || null;
   };
@@ -95,8 +101,8 @@ export function ImageUploader({
           <Image
             src={previewUrl}
             alt={`${label} preview`}
-            layout="fill"
-            objectFit="cover"
+            fill
+            sizes="(max-width: 768px) 100vw, 400px"
             data-ai-hint={dataAiHint || "abstract background"}
             className="bg-muted"
           />
@@ -113,25 +119,20 @@ export function ImageUploader({
         </div>
       )}
       <div className="flex items-center gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          asChild
-          className="cursor-pointer"
+        <label
+          htmlFor={fieldName}
+          className="cursor-pointer flex items-center px-3 py-2 border rounded-md bg-background hover:bg-muted transition"
         >
-          <div>
-            <ImageUp className="mr-2 h-4 w-4" />
-            <span>{previewUrl ? "Change" : "Upload"} Image</span>
-            <Input
-              id={fieldName}
-              type="file"
-              accept="image/*"
-              className="sr-only"
-              onChange={handleFileChange}
-            />
-          </div>
-        </Button>
+          <ImageUp className="mr-2 h-4 w-4" />
+          <span>{previewUrl ? "Change" : "Upload"} Image</span>
+          <Input
+            id={fieldName}
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            onChange={handleFileChange}
+          />
+        </label>
       </div>
       {/* Hidden input to satisfy react-hook-form for the URL string */}
       <Input type="hidden" {...form.register(fieldName)} />

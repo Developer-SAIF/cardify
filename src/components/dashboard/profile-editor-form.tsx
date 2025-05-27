@@ -50,6 +50,7 @@ export function ProfileEditorForm() {
   //   }
   // }, [profile, reset]);
 
+  console.log(profile);
   if (loading || !profile) {
     return (
       <div className="flex justify-center items-center p-8">
@@ -84,6 +85,7 @@ export function ProfileEditorForm() {
   }
   
   async function onSubmit(data: UserProfileFormData) {
+    console.log(data);
     if (!profile) return;
     const updatedProfile = mapFormDataToProfile(data, profile);
     setProfileContext(updatedProfile);

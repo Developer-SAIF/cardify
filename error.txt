@@ -1,39 +1,4 @@
-SyntaxError: Unexpected token 'o', "[object Obj"... is not valid JSON
-    at JSON.parse (<anonymous>)
-    at handler (src/pages/api/user/[userId].ts:27:39)
-  25 |
-  26 |       // Parse JSON fields and apply defaults if needed
-> 27 |       user.skills = user.skills ? JSON.parse(user.skills) : DEFAULT_SKILLS;
-     |                                       ^
-  28 |       user.education = user.education
-  29 |         ? JSON.parse(user.education)
-  30 |         : DEFAULT_EDUCATION; {
-  page: '/api/user/[userId]'
-}
- ⨯ SyntaxError: Unexpected token 'o', "[object Obj"... is not valid JSON
-    at JSON.parse (<anonymous>)
-    at handler (src/pages/api/user/[userId].ts:27:39)
-  25 |
-  26 |       // Parse JSON fields and apply defaults if needed
-> 27 |       user.skills = user.skills ? JSON.parse(user.skills) : DEFAULT_SKILLS;
-     |                                       ^
-  28 |       user.education = user.education
-  29 |         ? JSON.parse(user.education)
-  30 |         : DEFAULT_EDUCATION; {
-  page: '/api/user/[userId]'
-}
- ○ Compiling /_error ...
- ✓ Compiled /_error in 10s
-Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
-    at ShadowPortal (/home/saif/HDD/studio/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
-    at DevOverlay (/home/saif/HDD/studio/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
-    at ReactDevOverlay (/home/saif/HDD/studio/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
-    at div
-    at Body (webpack://next/dist/src/server/render.tsx:1263:19)
-Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
-    at ShadowPortal (/home/saif/HDD/studio/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
-    at DevOverlay (/home/saif/HDD/studio/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
-    at ReactDevOverlay (/home/saif/HDD/studio/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
-    at div
-    at Body (webpack://next/dist/src/server/render.tsx:1263:19)
- GET /api/user/12345 500 in 13739ms
+2025-01-01 01:40:12 Execute fail : Unable to create or change a table without a primary key, when the system variable 'sql_require_primary_key' is set. Add a primary key to the table or unset this variable to avoid this message. Note that tables without a primary key can cause performance problems in row-based replication, so please consult your DBA before changing this setting.
+
+
+Execute fail : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 3
