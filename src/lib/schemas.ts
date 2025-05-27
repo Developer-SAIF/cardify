@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const socialLinkSchema = z.object({
   id: z.string().min(1, "ID is required"),
@@ -25,12 +25,18 @@ export const educationEntrySchema = z.object({
 export const userProfileSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  headline: z.string().max(100, "Headline must be 100 characters or less").optional(),
+  headline: z
+    .string()
+    .max(100, "Headline must be 100 characters or less")
+    .optional(),
   profession: z.string().optional(),
   company: z.string().optional(),
   location: z.string().optional(),
-  profilePictureUrl: z.string().url("Must be a valid URL for profile picture").optional(),
-  coverPhotoUrl: z.string().url("Must be a valid URL for cover photo").optional(),
+  profilePictureUrl: z
+    .string()
+    .url("Must be a valid URL for profile picture")
+    .or(z.literal("")) // allow empty string
+    .optional(),
   contactEmail: z.string().email("Invalid email address").optional(),
   contactPhone: z.string().optional(), // Add more specific phone validation if needed
   skills: z.array(skillSchema),

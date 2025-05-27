@@ -1,6 +1,6 @@
 "use client";
 
-import { DEFAULT_PROFILE_PICTURE_URL, DEFAULT_COVER_PHOTO_URL } from "@/types";
+import { DEFAULT_PROFILE_PICTURE_URL } from "@/types";
 import Image from "next/image";
 import type { UserProfile } from "@/types";
 import { getThemeById, availableThemes } from "@/types";
@@ -58,25 +58,9 @@ export function CardPreview() {
       )}
     >
       <div className="bg-background/80 backdrop-blur-md rounded-lg p-6 space-y-6 text-foreground">
-        {/* Cover Photo */}
-        <div className="relative h-32 md:h-40 -m-6 mb-0 rounded-t-lg">
-          <div className="w-full h-full overflow-hidden rounded-t-lg">
-            {profile.coverPhotoUrl ? (
-              <Image
-                src={profile.coverPhotoUrl || DEFAULT_COVER_PHOTO_URL}
-                alt="Cover photo"
-                layout="fill"
-                objectFit="cover"
-                data-ai-hint="abstract background"
-              />
-            ) : (
-              <div className="h-full w-full bg-muted flex items-center justify-center">
-                <Sparkles className="w-10 h-10 text-muted-foreground/50" />
-              </div>
-            )}
-          </div>
-          {/* Profile Picture */}
-          <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-background shadow-lg overflow-hidden bg-muted">
+        {/* Profile Picture */}
+        <div className="flex justify-center mt-8 mb-4">
+          <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-background shadow-lg overflow-hidden bg-muted">
             {profile.profilePictureUrl ? (
               <Image
                 src={profile.profilePictureUrl || DEFAULT_PROFILE_PICTURE_URL}

@@ -1,5 +1,4 @@
 export const DEFAULT_PROFILE_PICTURE_URL = "https://placehold.co/150x150.png";
-export const DEFAULT_COVER_PHOTO_URL = "https://placehold.co/800x300.png";
 
 export interface SocialLink {
   id: string;
@@ -79,7 +78,6 @@ export interface UserProfile {
   company: string;
   location: string;
   profilePictureUrl: string;
-  coverPhotoUrl: string;
   contactEmail: string;
   contactPhone: string;
   skills: Skill[];
@@ -142,7 +140,7 @@ export const availableThemes: Array<{
 ];
 
 export const initialProfileData: UserProfile = {
-  userId: "12345", // Default mock user ID
+  userId: "12345",
   firstName: "Alex",
   lastName: "Johnson",
   headline: "Innovator | Leader | Tech Enthusiast",
@@ -150,7 +148,6 @@ export const initialProfileData: UserProfile = {
   company: "Innovatech Ltd.",
   location: "New York, USA",
   profilePictureUrl: "https://placehold.co/150x150.png",
-  coverPhotoUrl: "https://placehold.co/800x300.png",
   contactEmail: "alex.johnson@example.com",
   contactPhone: "+1 123 456 7890",
   skills: [

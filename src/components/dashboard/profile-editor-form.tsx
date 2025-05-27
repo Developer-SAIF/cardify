@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import type { UserProfileFormData } from "@/lib/schemas";
@@ -44,11 +45,11 @@ export function ProfileEditorForm() {
   const linksArray = useFieldArray({ control, name: "links" });
 
   // Reset form when profile data changes (e.g., on login)
-  // useEffect(() => {
-  //   if (profile) {
-  //     reset(mapProfileToFormData(profile));
-  //   }
-  // }, [profile, reset]);
+  useEffect(() => {
+    if (profile) {
+      reset(mapProfileToFormData(profile));
+    }
+  }, [profile, reset]);
 
   console.log(profile);
   if (loading || !profile) {
@@ -68,7 +69,6 @@ export function ProfileEditorForm() {
       company: profileData.company || "",
       location: profileData.location || "",
       profilePictureUrl: profileData.profilePictureUrl || "",
-      coverPhotoUrl: profileData.coverPhotoUrl || "",
       contactEmail: profileData.contactEmail || "",
       contactPhone: profileData.contactPhone || "",
     };
@@ -83,23 +83,33 @@ export function ProfileEditorForm() {
       ...formData,
     };
   }
-  
+
   async function onSubmit(data: UserProfileFormData) {
-    console.log(data);
     if (!profile) return;
     const updatedProfile = mapFormDataToProfile(data, profile);
-    setProfileContext(updatedProfile);
-
-    await fetch(`/api/user/${profile.userId}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedProfile),
-    });
-
-    toast({
-      title: "Profile Updated",
-      description: "Your digital business card has been saved.",
-    });
+    try {
+      const response = await fetch(`/api/user/${profile.userId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedProfile),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to save profile");
+      }
+      // Only update context after successful save
+      setProfileContext(updatedProfile);
+      toast({
+        title: "Profile Updated",
+        description: "Your digital business card has been saved.",
+      });
+    } catch (error) {
+      toast({
+        title: "Save Failed",
+        description:
+          "There was a problem saving your profile. Please try again.",
+        variant: "destructive",
+      });
+    }
   }
 
   const generateNewSkill = (): Skill => ({
@@ -165,17 +175,8 @@ export function ProfileEditorForm() {
               form={form}
               fieldName="profilePictureUrl"
               label="Profile Picture"
-              currentImageUrl={watch("profilePictureUrl")}
               aspectRatio="1/1"
               dataAiHint="profile avatar"
-            />
-            <ImageUploader
-              form={form}
-              fieldName="coverPhotoUrl"
-              label="Cover Photo"
-              currentImageUrl={watch("coverPhotoUrl")}
-              aspectRatio="16/6"
-              dataAiHint="abstract banner"
             />
           </CardContent>
         </Card>

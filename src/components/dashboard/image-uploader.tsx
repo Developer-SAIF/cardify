@@ -11,13 +11,9 @@ import { useState, useEffect } from "react";
 
 interface ImageUploaderProps {
   form: UseFormReturn<UserProfileFormData>;
-  fieldName: keyof Pick<
-    UserProfileFormData,
-    "profilePictureUrl" | "coverPhotoUrl"
-  >;
+  fieldName: "profilePictureUrl";
   label: string;
-  currentImageUrl?: string;
-  aspectRatio?: string; // e.g. "1/1" for square, "16/9" for wide
+  aspectRatio?: string; // e.g. "1/1" for square
   dataAiHint?: string;
 }
 
@@ -25,17 +21,19 @@ export function ImageUploader({
   form,
   fieldName,
   label,
-  currentImageUrl,
   aspectRatio = "16/9",
   dataAiHint,
 }: ImageUploaderProps) {
+  const currentFieldValue = form.watch(fieldName);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(
-    currentImageUrl
+    currentFieldValue
   );
+  const [canChangeImage, setCanChangeImage] = useState(false);
 
   useEffect(() => {
-    setPreviewUrl(currentImageUrl);
-  }, [currentImageUrl]);
+    setPreviewUrl(currentFieldValue);
+    setCanChangeImage(false); // Reset when value changes
+  }, [currentFieldValue]);
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -47,6 +45,8 @@ export function ImageUploader({
         return;
       }
       setPreviewUrl(undefined); // Optionally show a loading state
+      // Only allow file change if canChangeImage is true
+      if (!canChangeImage && previewUrl) return;
       const imgbbUrl = await uploadToImgbb(file);
       if (imgbbUrl) {
         setPreviewUrl(imgbbUrl);
@@ -55,6 +55,17 @@ export function ImageUploader({
           shouldDirty: true,
         });
         await form.trigger(fieldName); // Ensure form state is updated
+        setCanChangeImage(false); // Reset after change
+        // Automatically save profile after image upload
+        if (form.handleSubmit) {
+          form.handleSubmit(async (data) => {
+            if (typeof window !== "undefined") {
+              // Find the closest form element and submit it
+              const formEl = document.querySelector("form");
+              if (formEl) formEl.requestSubmit();
+            }
+          })();
+        }
       } else {
         alert("Image upload failed. Please try again.");
       }
@@ -73,7 +84,8 @@ export function ImageUploader({
 
     if (!res.ok) {
       console.error("Failed to upload image:", res.statusText);
-      return null;}
+      return null;
+    }
     const data = await res.json();
     return data.data?.url || null;
   };
@@ -81,12 +93,8 @@ export function ImageUploader({
   const handleRemoveImage = () => {
     setPreviewUrl(undefined);
     form.setValue(fieldName, "");
+    setCanChangeImage(true);
   };
-
-  const currentFieldValue = form.watch(fieldName);
-  useEffect(() => {
-    setPreviewUrl(currentFieldValue);
-  }, [currentFieldValue]);
 
   return (
     <div className="space-y-2">
@@ -121,7 +129,11 @@ export function ImageUploader({
       <div className="flex items-center gap-2">
         <label
           htmlFor={fieldName}
-          className="cursor-pointer flex items-center px-3 py-2 border rounded-md bg-background hover:bg-muted transition"
+          className={`cursor-pointer flex items-center px-3 py-2 border rounded-md bg-background transition ${
+            previewUrl && !canChangeImage
+              ? "opacity-50 pointer-events-none"
+              : "hover:bg-muted"
+          }`}
         >
           <ImageUp className="mr-2 h-4 w-4" />
           <span>{previewUrl ? "Change" : "Upload"} Image</span>
@@ -131,6 +143,7 @@ export function ImageUploader({
             accept="image/*"
             className="sr-only"
             onChange={handleFileChange}
+            disabled={!!previewUrl && !canChangeImage}
           />
         </label>
       </div>

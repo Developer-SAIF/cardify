@@ -5,7 +5,7 @@
 - Unique ID Login: User authentication via unique ID for secure access.
 - Card Preview: Display a preview of the digital business card.
 - Profile Information Editor: Enable users to input and edit personal and professional details such as name, headline, profession, company, location, education, skills, and contact information.
-- Image Upload: Functionality to upload a profile picture and cover photo; storing links from ImgBB.
+- Image Upload: Functionality to upload a profile picture; storing link from ImgBB.
 - Link Management: Option to add multiple social media, web and contact links with visibility control for each field.
 - Theme Selection: Allow users to select from pre-designed gradient color themes.
 - Unique Card URL: Generation of a unique URL for each user's digital business card for easy sharing.
