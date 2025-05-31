@@ -65,9 +65,7 @@ export function ProfileEditorForm() {
     return {
       ...profileData,
       headline: profileData.headline || "",
-      profession: profileData.profession || "",
-      company: profileData.company || "",
-      location: profileData.location || "",
+      professionalDetails: profileData.professionalDetails || [],
       profilePictureUrl: profileData.profilePictureUrl || "",
       contactEmail: profileData.contactEmail || "",
       contactPhone: profileData.contactPhone || "",
@@ -85,7 +83,7 @@ export function ProfileEditorForm() {
   }
 
   async function onSubmit(data: UserProfileFormData) {
-    if (!profile) return;
+    if (!profile || !profile.userId) return;
     const updatedProfile = mapFormDataToProfile(data, profile);
     try {
       const response = await fetch(`/api/user/${profile.userId}`, {
@@ -204,126 +202,42 @@ export function ProfileEditorForm() {
           />
         </EditableSection>
 
-        <EditableSection
-          title="Professional Details"
-          description="Your role, company, and location."
-          isVisible={
-            watch("showProfession") ||
-            watch("showCompany") ||
-            watch("showLocation")
-          }
-          onToggleVisibility={(v) => {
-            setValue("showProfession", v);
-            setValue("showCompany", v);
-            setValue("showLocation", v);
-          }}
-        >
-          <div className="space-y-4">
-            <FormField
-              control={control}
-              name="profession"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Profession / Role</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., Software Engineer" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={control}
-              name="company"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Company</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., Tech Solutions Inc." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., San Francisco, CA" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </EditableSection>
-
-        <EditableSection
-          title="Contact Information"
-          isVisible={watch("showContactEmail") || watch("showContactPhone")}
-          onToggleVisibility={(v) => {
-            setValue("showContactEmail", v);
-            setValue("showContactPhone", v);
-          }}
-        >
-          <div className="space-y-4">
-            <FormField
-              control={control}
-              name="contactEmail"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="e.g., john.doe@example.com"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={control}
-              name="contactPhone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="tel"
-                      placeholder="e.g., +1-555-0100"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </EditableSection>
-
         <Separator />
         <Card>
           <CardHeader>
-            <CardTitle>Skills</CardTitle>
+            <CardTitle>Professional Details</CardTitle>
           </CardHeader>
           <CardContent>
             <DynamicListEditor
               control={control}
-              fieldArray={skillsArray}
-              listName="skills"
-              itemTitleKey="name"
-              generateNewItem={generateNewSkill}
+              fieldArray={useFieldArray({
+                control,
+                name: "professionalDetails",
+              })}
+              listName="professionalDetails"
+              itemTitleKey="profession"
+              generateNewItem={() => ({
+                id: uuidv4(),
+                profession: "",
+                company: "",
+                location: "",
+                isVisible: true,
+              })}
               fieldsConfig={[
                 {
-                  name: "name",
-                  label: "Skill Name",
-                  placeholder: "e.g., React, Project Management",
+                  name: "profession",
+                  label: "Profession / Role",
+                  placeholder: "e.g., Software Engineer",
+                },
+                {
+                  name: "company",
+                  label: "Company",
+                  placeholder: "e.g., Tech Solutions Inc.",
+                },
+                {
+                  name: "location",
+                  label: "Location",
+                  placeholder: "e.g., San Francisco, CA",
                 },
               ]}
               itemClassName="bg-background/50"

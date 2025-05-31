@@ -22,6 +22,14 @@ export const educationEntrySchema = z.object({
   isVisible: z.boolean(),
 });
 
+export const professionalDetailSchema = z.object({
+  id: z.string().min(1, "ID is required"),
+  profession: z.string().min(1, "Profession is required"),
+  company: z.string().optional(),
+  location: z.string().optional(),
+  isVisible: z.boolean().optional(),
+});
+
 export const userProfileSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
@@ -43,6 +51,7 @@ export const userProfileSchema = z.object({
   education: z.array(educationEntrySchema),
   links: z.array(socialLinkSchema),
   theme: z.string().min(1, "Theme is required"),
+  professionalDetails: z.array(professionalDetailSchema),
 
   showHeadline: z.boolean(),
   showProfession: z.boolean(),
@@ -52,4 +61,8 @@ export const userProfileSchema = z.object({
   showContactPhone: z.boolean(),
 });
 
+export type SocialLink = z.infer<typeof socialLinkSchema>;
+export type Skill = z.infer<typeof skillSchema>;
+export type EducationEntry = z.infer<typeof educationEntrySchema>;
+export type ProfessionalDetail = z.infer<typeof professionalDetailSchema>;
 export type UserProfileFormData = z.infer<typeof userProfileSchema>;

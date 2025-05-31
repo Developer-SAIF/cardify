@@ -69,6 +69,14 @@ export interface EducationEntry {
   isVisible: boolean;
 }
 
+export interface ProfessionalDetail {
+  id: string;
+  profession: string;
+  company?: string;
+  location?: string;
+  isVisible?: boolean;
+}
+
 export interface UserProfile {
   userId: string;
   firstName: string;
@@ -84,6 +92,7 @@ export interface UserProfile {
   education: EducationEntry[];
   links: SocialLink[];
   theme: string; // Theme ID
+  professionalDetails: ProfessionalDetail[];
 
   showHeadline: boolean;
   showProfession: boolean;
@@ -203,6 +212,7 @@ export const initialProfileData: UserProfile = {
   showLocation: true,
   showContactEmail: true,
   showContactPhone: true,
+  professionalDetails: [],
 };
 
 export const getThemeById = (themeId: string) => {

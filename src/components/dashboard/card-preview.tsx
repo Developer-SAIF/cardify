@@ -62,23 +62,26 @@ export function CardPreview() {
             </p>
           )}
           {/* Professional & Education Details */}
-          {(profile.showProfession && profile.profession) ||
+          {profile.professionalDetails?.some((p) => p.isVisible) ||
           profile.education.some((e) => e.isVisible) ? (
             <div className="w-full mt-4 mb-2">
               <div className="border-l-4 border-primary pl-4 py-2 bg-primary/5 rounded-md">
-                {profile.showProfession && profile.profession && (
-                  <p className="text-neutral-700 dark:text-neutral-200 text-base text-left mb-1">
-                    {profile.profession}
-                    {profile.showCompany && profile.company && (
-                      <> at {profile.company}</>
-                    )}
-                    {profile.showLocation && profile.location && (
-                      <>, {profile.location}</>
-                    )}
-                  </p>
-                )}
+                {/* Professional Details */}
+                {profile.professionalDetails
+                  ?.filter((p) => p.isVisible)
+                  .map((prof) => (
+                    <div
+                      key={prof.id}
+                      className="text-neutral-700 dark:text-neutral-200 text-base text-left mb-1"
+                    >
+                      <span className="font-medium">{prof.profession}</span>
+                      {prof.company && <span> at {prof.company}</span>}
+                      {prof.location && <span>, {prof.location}</span>}
+                    </div>
+                  ))}
+                {/* Education Details */}
                 {profile.education.some((e) => e.isVisible) && (
-                  <div className="text-neutral-600 dark:text-neutral-300 text-base text-left space-y-1">
+                  <div className="text-neutral-600 dark:text-neutral-300 text-base text-left space-y-1 mt-2">
                     {profile.education
                       .filter((e) => e.isVisible)
                       .map((edu) => (

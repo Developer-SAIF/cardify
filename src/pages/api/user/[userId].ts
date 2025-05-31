@@ -34,6 +34,17 @@ export default async function handler(
       user.skills = user.skills ? user.skills : DEFAULT_SKILLS;
       user.education = user.education ? user.education : DEFAULT_EDUCATION;
       user.links = user.links ? user.links : DEFAULT_LINKS;
+      user.professionalDetails = user.professionalDetails
+        ? user.professionalDetails
+        : [];
+      // Parse JSON if not already parsed
+      if (typeof user.skills === "string")
+        user.skills = JSON.parse(user.skills);
+      if (typeof user.education === "string")
+        user.education = JSON.parse(user.education);
+      if (typeof user.links === "string") user.links = JSON.parse(user.links);
+      if (typeof user.professionalDetails === "string")
+        user.professionalDetails = JSON.parse(user.professionalDetails);
 
       res.status(200).json(user);
     } else {
@@ -46,6 +57,8 @@ export default async function handler(
     if (data.skills) data.skills = JSON.stringify(data.skills);
     if (data.education) data.education = JSON.stringify(data.education);
     if (data.links) data.links = JSON.stringify(data.links);
+    if (data.professionalDetails)
+      data.professionalDetails = JSON.stringify(data.professionalDetails);
 
     try {
       await db.query(`REPLACE INTO user_profiles SET ?`, [data]);
