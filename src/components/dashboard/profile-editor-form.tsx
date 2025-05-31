@@ -1,5 +1,6 @@
 "use client";
 
+import "@/app/floating-save-btn.css";
 import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -23,12 +24,23 @@ import { ImageUploader } from "./image-uploader";
 import { ThemeSelector } from "./theme-selector";
 import { EditableSection } from "./editable-section";
 import { DynamicListEditor } from "./dynamic-list-editor";
-import { Save, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { v4 as uuidv4 } from "uuid"; // For generating unique IDs
+import { Eye, Loader2 } from "lucide-react";
+import type { Dispatch, SetStateAction } from "react";
 
-export function ProfileEditorForm() {
+interface ProfileEditorFormProps {
+  isMobile?: boolean;
+  showPreview?: boolean;
+  setShowPreview?: Dispatch<SetStateAction<boolean>>;
+}
+
+export function ProfileEditorForm({
+  isMobile,
+  showPreview,
+  setShowPreview,
+}: ProfileEditorFormProps) {
   const { profile, setProfile: setProfileContext, loading } = useProfile();
   const { toast } = useToast();
 
@@ -315,21 +327,51 @@ export function ProfileEditorForm() {
         <Separator />
         <ThemeSelector />
 
-        <div className="pt-6">
-          <Button
-            type="submit"
-            className="w-full md:w-auto"
-            size="lg"
-            disabled={form.formState.isSubmitting}
-          >
-            {form.formState.isSubmitting ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        {/* Floating Save/Preview Buttons for mobile */}
+        {isMobile ? (
+          <div className="pt-6 floating-save-btn flex gap-2 w-full">
+            <Button
+              type="submit"
+              className="w-1/2"
+              size="lg"
+              disabled={form.formState.isSubmitting}
+            >
+              Save
+            </Button>
+            {showPreview ? (
+              <Button
+                type="button"
+                className="w-1/2 bg-secondary text-primary border border-primary hover:bg-primary hover:text-white"
+                size="lg"
+                onClick={() => setShowPreview && setShowPreview(false)}
+                aria-pressed={!showPreview}
+              >
+                <Eye className="mr-2 h-5 w-5" /> Editor preview
+              </Button>
             ) : (
-              <Save className="mr-2 h-4 w-4" />
+              <Button
+                type="button"
+                className="w-1/2 bg-secondary text-primary border border-primary hover:bg-primary hover:text-white"
+                size="lg"
+                onClick={() => setShowPreview && setShowPreview(true)}
+                aria-pressed={!!showPreview}
+              >
+                <Eye className="mr-2 h-5 w-5" /> Live Preview
+              </Button>
             )}
-            Save Changes
-          </Button>
-        </div>
+          </div>
+        ) : (
+          <div className="pt-6 floating-save-btn">
+            <Button
+              type="submit"
+              className="w-full md:w-auto"
+              size="lg"
+              disabled={form.formState.isSubmitting}
+            >
+              Save
+            </Button>
+          </div>
+        )}
       </form>
     </Form>
   );

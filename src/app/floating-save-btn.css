@@ -1,0 +1,20 @@
+/* Floating Save Changes Button */
+.floating-save-btn {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  right: auto;
+  z-index: 50;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  border-radius: 0.5rem;
+}
+@media (max-width: 768px) {
+  .floating-save-btn {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    border-radius: 0;
+    box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.1);
+  }
+}
