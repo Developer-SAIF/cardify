@@ -43,3 +43,7 @@ next-env.d.ts
 # firebase
 firebase-debug.log
 firestore-debug.log
+.next.zip
+id_rsa.ppk
+node_modules.zip
+SSH password

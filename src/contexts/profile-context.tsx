@@ -24,7 +24,7 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
     useState<string>(DEFAULT_THEME_ID);
 
   useEffect(() => {
-    const storedUserId = localStorage.getItem("cardifyUserId");
+    const storedUserId = localStorage.getItem("porichoyUserId");
     if (storedUserId) {
       fetch(`/api/user/${storedUserId}`)
         .then((res) => (res.ok ? res.json() : null))
@@ -33,7 +33,7 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
             setProfile(data);
             setCurrentThemeId(data.theme);
           } else {
-            localStorage.removeItem("cardifyUserId");
+            localStorage.removeItem("porichoyUserId");
           }
           setLoading(false);
         });
@@ -56,7 +56,7 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
       const data = await res.json();
       setProfile(data);
       setCurrentThemeId(data.theme);
-      localStorage.setItem("cardifyUserId", userId);
+      localStorage.setItem("porichoyUserId", userId);
       setLoading(false);
       return true;
     }
@@ -66,7 +66,7 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     setProfile(null);
-    localStorage.removeItem("cardifyUserId");
+    localStorage.removeItem("porichoyUserId");
     setCurrentThemeId(DEFAULT_THEME_ID);
   };
 

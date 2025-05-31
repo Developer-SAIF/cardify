@@ -2,33 +2,12 @@
 
 import { DEFAULT_PROFILE_PICTURE_URL } from "@/types";
 import Image from "next/image";
-import type { UserProfile } from "@/types";
 import { getThemeById, availableThemes } from "@/types";
-import {
-  Mail,
-  Phone,
-  MapPin,
-  Briefcase,
-  GraduationCap,
-  Link as LinkIcon,
-  Sparkles,
-  Building,
-  User,
-  Globe,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useProfile } from "@/contexts/profile-context";
 import { Skeleton } from "@/components/ui/skeleton";
-
-const IconMap: Record<string, React.ElementType> = {
-  linkedin: Globe,
-  github: Globe,
-  twitter: Globe,
-  website: Globe,
-  email: Mail,
-  phone: Phone,
-  default: LinkIcon,
-};
+import { User } from "lucide-react";
+import { Globe } from "lucide-react";
 
 export function CardPreview() {
   const { profile, loading: profileLoading, currentThemeId } = useProfile();
@@ -45,22 +24,20 @@ export function CardPreview() {
     );
   }
 
-  // Use currentThemeId directly as it's the live selected theme.
-  // currentThemeId is guaranteed to be a string by ProfileContext.
   const theme = getThemeById(currentThemeId);
   const cardThemeClass = theme.gradientClass;
 
   return (
-    <div
-      className={cn(
-        "w-full max-w-md mx-auto rounded-xl shadow-2xl overflow-hidden text-white p-1",
-        cardThemeClass
-      )}
-    >
-      <div className="bg-background/80 backdrop-blur-md rounded-lg p-6 space-y-6 text-foreground">
-        {/* Profile Picture */}
-        <div className="flex justify-center mt-8 mb-4">
-          <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-background shadow-lg overflow-hidden bg-muted">
+    <div className="min-h-screen flex flex-col justify-center items-center py-10 px-2 bg-transparent">
+      <div
+        className={cn(
+          "w-full max-w-lg mx-auto rounded-3xl shadow-xl overflow-hidden h-full flex flex-col border-4",
+          theme.borderClass || "border-primary"
+        )}
+      >
+        <div className="flex flex-col items-center p-10 pt-8 flex-1">
+          {/* Profile Picture */}
+          <div className="relative w-32 h-32 rounded-full border-4 border-white dark:border-neutral-900 shadow-lg overflow-hidden bg-muted mb-4">
             {profile.profilePictureUrl ? (
               <Image
                 src={profile.profilePictureUrl || DEFAULT_PROFILE_PICTURE_URL}
@@ -71,145 +48,93 @@ export function CardPreview() {
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <User className="w-12 h-12 text-muted-foreground/50" />
+                <User className="w-14 h-14 text-muted-foreground/50" />
               </div>
             )}
           </div>
-        </div>
-        <div className="pt-12 md:pt-14" />
-        {/* Name & Headline */}
-        <div className="text-center">
-          <h1 className="text-3xl font-bold">
+          {/* Name & Headline */}
+          <h1 className="text-4xl font-extrabold text-neutral-900 dark:text-white mt-2 tracking-tight text-center">
             {profile.firstName} {profile.lastName}
           </h1>
           {profile.showHeadline && profile.headline && (
-            <p className="text-md text-foreground/80 mt-1">
+            <p className="text-lg text-neutral-600 dark:text-neutral-300 mt-2 text-center font-medium">
               {profile.headline}
             </p>
           )}
-        </div>
-        {/* Professional Info */}
-        {(profile.showProfession ||
-          profile.showCompany ||
-          profile.showLocation) && (
-          <div className="space-y-2 text-sm">
-            {profile.showProfession && profile.profession && (
-              <div className="flex items-center justify-center">
-                <Briefcase className="mr-2 h-4 w-4 text-primary" />
-                <span>{profile.profession}</span>
-              </div>
-            )}
-            {profile.showCompany && profile.company && (
-              <div className="flex items-center justify-center">
-                <Building className="mr-2 h-4 w-4 text-primary" />
-                <span>{profile.company}</span>
-              </div>
-            )}
-            {profile.showLocation && profile.location && (
-              <div className="flex items-center justify-center">
-                <MapPin className="mr-2 h-4 w-4 text-primary" />
-                <span>{profile.location}</span>
-              </div>
-            )}
-          </div>
-        )}
-        {/* Contact Info */}
-        {(profile.showContactEmail || profile.showContactPhone) && (
-          <div className="border-t border-border pt-4 space-y-2 text-sm">
-            {profile.showContactEmail && profile.contactEmail && (
-              <div className="flex items-center">
-                <Mail className="mr-3 h-5 w-5 text-primary flex-shrink-0" />
-                <a
-                  href={`mailto:${profile.contactEmail}`}
-                  className="hover:underline break-all"
-                >
-                  {profile.contactEmail}
-                </a>
-              </div>
-            )}
-            {profile.showContactPhone && profile.contactPhone && (
-              <div className="flex items-center">
-                <Phone className="mr-3 h-5 w-5 text-primary flex-shrink-0" />
-                <a
-                  href={`tel:${profile.contactPhone}`}
-                  className="hover:underline"
-                >
-                  {profile.contactPhone}
-                </a>
-              </div>
-            )}
-          </div>
-        )}
-        {/* Skills */}
-        {profile.skills.some((s) => s.isVisible) && (
-          <div className="border-t border-border pt-4">
-            <h3 className="text-sm font-semibold mb-2 uppercase tracking-wider text-primary">
-              Skills
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {profile.skills
-                .filter((s) => s.isVisible)
-                .map((skill) => (
-                  <span
-                    key={skill.id}
-                    className="px-3 py-1 text-xs bg-primary/10 text-primary rounded-full font-medium"
-                  >
-                    {skill.name}
-                  </span>
-                ))}
-            </div>
-          </div>
-        )}
-        {/* Education */}
-        {profile.education.some((e) => e.isVisible) && (
-          <div className="border-t border-border pt-4 space-y-3">
-            <h3 className="text-sm font-semibold mb-1 uppercase tracking-wider text-primary">
-              Education
-            </h3>
-            {profile.education
-              .filter((e) => e.isVisible)
-              .map((edu) => (
-                <div key={edu.id} className="text-sm">
-                  <div className="flex items-start">
-                    <GraduationCap className="mr-3 mt-1 h-5 w-5 text-primary flex-shrink-0" />
-                    <div>
-                      <p className="font-semibold">{edu.institution}</p>
-                      <p className="text-foreground/80">{edu.degree}</p>
-                      <p className="text-xs text-foreground/60">{edu.period}</p>
-                    </div>
+          {/* Professional & Education Details */}
+          {(profile.showProfession && profile.profession) ||
+          profile.education.some((e) => e.isVisible) ? (
+            <div className="w-full mt-4 mb-2">
+              <div className="border-l-4 border-primary pl-4 py-2 bg-primary/5 rounded-md">
+                {profile.showProfession && profile.profession && (
+                  <p className="text-neutral-700 dark:text-neutral-200 text-base text-left mb-1">
+                    {profile.profession}
+                    {profile.showCompany && profile.company && (
+                      <> at {profile.company}</>
+                    )}
+                    {profile.showLocation && profile.location && (
+                      <>, {profile.location}</>
+                    )}
+                  </p>
+                )}
+                {profile.education.some((e) => e.isVisible) && (
+                  <div className="text-neutral-600 dark:text-neutral-300 text-base text-left space-y-1">
+                    {profile.education
+                      .filter((e) => e.isVisible)
+                      .map((edu) => (
+                        <div key={edu.id}>
+                          <span className="font-medium">{edu.institution}</span>
+                          {edu.degree && <span>, {edu.degree}</span>}
+                          {edu.period && <span> ({edu.period})</span>}
+                        </div>
+                      ))}
                   </div>
-                </div>
-              ))}
-          </div>
-        )}
-        {/* Links */}
-        {profile.links.some((l) => l.isVisible) && (
-          <div className="border-t border-border pt-4 space-y-2">
-            <h3 className="text-sm font-semibold mb-1 uppercase tracking-wider text-primary">
-              Links
-            </h3>
-            {profile.links
-              .filter((l) => l.isVisible)
-              .map((link) => {
-                const Icon =
-                  IconMap[link.platform.toLowerCase()] || IconMap.default;
-                return (
+                )}
+              </div>
+            </div>
+          ) : null}
+
+          {/* Skills */}
+          {profile.skills.some((s) => s.isVisible) && (
+            <div className="w-full mt-8">
+              <h3 className="text-xs font-semibold mb-2 uppercase tracking-wider text-primary text-center">
+                Skills
+              </h3>
+              <div className="flex flex-wrap justify-center gap-2">
+                {profile.skills
+                  .filter((s) => s.isVisible)
+                  .map((skill) => (
+                    <span
+                      key={skill.id}
+                      className="px-4 py-1 text-sm bg-primary/10 text-primary rounded-full font-semibold"
+                    >
+                      {skill.name}
+                    </span>
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* Links with static icon (Globe) */}
+          {profile.links.some((l) => l.isVisible) && (
+            <div className="flex flex-wrap justify-center gap-3 mt-6">
+              {profile.links
+                .filter((l) => l.isVisible)
+                .map((link) => (
                   <a
                     key={link.id}
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center text-sm hover:text-primary transition-colors group"
+                    className="flex items-center gap-2 px-5 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors shadow text-base font-semibold min-w-[120px] justify-center"
                   >
-                    <Icon className="mr-3 h-5 w-5 text-primary/80 group-hover:text-primary flex-shrink-0" />
-                    <span className="truncate group-hover:underline">
-                      {link.label || link.platform}
-                    </span>
+                    <Globe className="h-5 w-5" />
+                    {link.label || link.platform}
                   </a>
-                );
-              })}
-          </div>
-        )}
+                ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

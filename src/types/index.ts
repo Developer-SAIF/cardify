@@ -100,6 +100,7 @@ export const availableThemes: Array<{
   name: string;
   gradientClass: string;
   previewClass: string;
+  borderClass?: string;
 }> = [
   {
     id: "ocean-blue",

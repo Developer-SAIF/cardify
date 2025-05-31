@@ -1,4 +1,4 @@
-# **App Name**: Cardify
+# **App Name**: Porichoy
 
 ## Core Features:
 

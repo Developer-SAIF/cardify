@@ -1,18 +1,18 @@
-import type { Metadata } from 'next';
-import { Roboto } from 'next/font/google';
-import './globals.css';
+import type { Metadata } from "next";
+import { Roboto } from "next/font/google";
+import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import { ProfileProvider } from '@/contexts/profile-context';
+import { ProfileProvider } from "@/contexts/profile-context";
 
 const roboto = Roboto({
-  weight: ['300', '400', '500', '700'],
-  subsets: ['latin'],
-  variable: '--font-roboto',
+  weight: ["300", "400", "500", "700"],
+  subsets: ["latin"],
+  variable: "--font-roboto",
 });
 
 export const metadata: Metadata = {
-  title: 'Cardify - Digital Business Cards',
-  description: 'Edit and share your digital business card with Cardify.',
+  title: "Porichoy - Digital Business Cards",
+  description: "Edit and share your digital business card with Porichoy.",
 };
 
 export default function RootLayout({
@@ -22,7 +22,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${roboto.variable} font-sans antialiased`} suppressHydrationWarning>
+      <body
+        className={`${roboto.variable} font-sans antialiased`}
+        suppressHydrationWarning
+      >
         <ProfileProvider>
           {children}
           <Toaster />

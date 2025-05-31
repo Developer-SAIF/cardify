@@ -1,11 +1,10 @@
-
 "use client";
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { useProfile } from '@/contexts/profile-context';
-import { LogOut, UserCircle, CreditCard } from 'lucide-react';
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { useProfile } from "@/contexts/profile-context";
+import { LogOut, UserCircle, CreditCard } from "lucide-react";
 
 export function AppHeader() {
   const { profile, logout } = useProfile();
@@ -13,7 +12,7 @@ export function AppHeader() {
 
   const handleLogout = () => {
     logout();
-    router.push('/'); 
+    router.push("/");
   };
 
   return (
@@ -21,18 +20,25 @@ export function AppHeader() {
       <div className="container flex h-14 items-center">
         <Link href="/" className="mr-6 flex items-center space-x-2">
           <CreditCard className="h-6 w-6 text-primary" />
-          <span className="font-bold sm:inline-block">
-            Cardify
-          </span>
+          <span className="font-bold sm:inline-block">Porichoy</span>
         </Link>
         <nav className="flex flex-1 items-center space-x-4 sm:justify-end">
           {profile ? (
             <>
-              <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard')}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push("/dashboard")}
+              >
                 <UserCircle className="mr-2 h-4 w-4" />
                 Dashboard
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => router.push(`/card/${profile.userId}`)} className="hidden sm:inline-flex">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push(`/card/${profile.userId}`)}
+                className="hidden sm:inline-flex"
+              >
                 View My Card
               </Button>
               <Button variant="outline" size="sm" onClick={handleLogout}>
@@ -41,7 +47,11 @@ export function AppHeader() {
               </Button>
             </>
           ) : (
-            <Button variant="default" size="sm" onClick={() => router.push('/')}>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => router.push("/")}
+            >
               Login
             </Button>
           )}

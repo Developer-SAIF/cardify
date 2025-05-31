@@ -1,21 +1,22 @@
-
 "use client";
 
-import { useEffect, useState, useRef } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { CardPreview } from '@/components/dashboard/card-preview';
-import { useProfile } from '@/contexts/profile-context';
-import type { UserProfile } from '@/types';
-import { initialProfileData } from '@/types';
-import { Loader2, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { useEffect, useState, useRef } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { CardPreview } from "@/components/dashboard/card-preview";
+import { useProfile } from "@/contexts/profile-context";
+import type { UserProfile } from "@/types";
+import { initialProfileData } from "@/types";
+import { Loader2, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function UserCardPage() {
   const params = useParams();
   const router = useRouter();
   const { userId: paramUserIdString } = params;
-  const paramUserId = Array.isArray(paramUserIdString) ? paramUserIdString[0] : paramUserIdString;
+  const paramUserId = Array.isArray(paramUserIdString)
+    ? paramUserIdString[0]
+    : paramUserIdString;
 
   const {
     profile: contextProfile,
@@ -30,7 +31,9 @@ export default function UserCardPage() {
 
   // Refs for context patching
   const isActiveContextPatch = useRef(false);
-  const originalContextProfileBeforePatch = useRef<UserProfile | null | undefined>(undefined);
+  const originalContextProfileBeforePatch = useRef<
+    UserProfile | null | undefined
+  >(undefined);
   const originalThemeIdBeforePatch = useRef<string | undefined>(undefined);
 
   // Step 1: Fetch profile for the card page if it's not the logged-in user's live view
@@ -54,7 +57,7 @@ export default function UserCardPage() {
     } else {
       // Fetch data for an external card or the demo card.
       const fetchProfileData = async (id: string) => {
-        await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
+        await new Promise((resolve) => setTimeout(resolve, 300)); // Simulate network delay
         if (id === initialProfileData.userId) {
           setCardProfile(initialProfileData);
         } else {
@@ -68,7 +71,8 @@ export default function UserCardPage() {
 
   // Step 2: Patch global context if displaying an external/demo card; restore on cleanup.
   useEffect(() => {
-    const isViewingOwnCard = contextProfile && contextProfile.userId === paramUserId;
+    const isViewingOwnCard =
+      contextProfile && contextProfile.userId === paramUserId;
 
     if (isViewingOwnCard) {
       // Viewing own card: ensure any patch is cleaned up if it was active.
@@ -87,7 +91,8 @@ export default function UserCardPage() {
     }
 
     // Viewing an external or demo card:
-    if (cardProfile) { // cardProfile is the fetched/initial data
+    if (cardProfile) {
+      // cardProfile is the fetched/initial data
       const needsPatch =
         contextProfile?.userId !== cardProfile.userId ||
         contextProfile?.theme !== cardProfile.theme ||
@@ -96,7 +101,9 @@ export default function UserCardPage() {
       if (needsPatch) {
         if (!isActiveContextPatch.current) {
           // Start of a patch: store original context
-          originalContextProfileBeforePatch.current = contextProfile ? { ...contextProfile } : null;
+          originalContextProfileBeforePatch.current = contextProfile
+            ? { ...contextProfile }
+            : null;
           originalThemeIdBeforePatch.current = contextCurrentThemeId;
           isActiveContextPatch.current = true;
         }
@@ -142,8 +149,13 @@ export default function UserCardPage() {
   ]);
 
   // Loading state logic
-  const isLoading = pageLoading || (contextLoading && (!cardProfile || (contextProfile && contextProfile.userId !== paramUserId && !cardProfile)));
-
+  const isLoading =
+    pageLoading ||
+    (contextLoading &&
+      (!cardProfile ||
+        (contextProfile &&
+          contextProfile.userId !== paramUserId &&
+          !cardProfile)));
 
   if (isLoading) {
     return (
@@ -160,8 +172,15 @@ export default function UserCardPage() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700 p-4 text-white">
         <h1 className="mb-4 text-4xl font-bold">Card Not Found</h1>
-        <p className="mb-8 text-lg">The digital business card you're looking for doesn't exist or is unavailable.</p>
-        <Button onClick={() => router.push('/')} variant="outline" className="border-white bg-transparent text-white hover:bg-white hover:text-slate-900">
+        <p className="mb-8 text-lg">
+          The digital business card you're looking for doesn't exist or is
+          unavailable.
+        </p>
+        <Button
+          onClick={() => router.push("/")}
+          variant="outline"
+          className="border-white bg-transparent text-white hover:bg-white hover:text-slate-900"
+        >
           <ArrowLeft className="mr-2 h-4 w-4" /> Go to Homepage
         </Button>
       </div>
@@ -175,7 +194,8 @@ export default function UserCardPage() {
         <div className="mt-8 text-center">
           <Link href="/" passHref>
             <Button variant="outline" className="bg-background/80">
-              <ArrowLeft className="mr-2 h-4 w-4" /> Create Your Own Cardify Card
+              <ArrowLeft className="mr-2 h-4 w-4" /> Create Your Own Porichoy
+              Card
             </Button>
           </Link>
         </div>
