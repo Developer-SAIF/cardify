@@ -1,32 +1,43 @@
-// Utility to map link platforms/URLs to Hugeicons
-import * as Hugeicons from "@hugeicons/react";
 import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  Linkedin01Icon,
+  Github01Icon,
+  TwitterIcon,
+  Facebook01Icon,
+  InstagramIcon,
+  GlobeIcon,
+  Mail01Icon,
+  PhoneCheckIcon,
+  YoutubeIcon,
+  WhatsappIcon,
+  TelegramIcon,
+  LinkCircleIcon,
+} from "@hugeicons/core-free-icons";
 
-// Add more mappings as needed
-const hugeiconMap: Record<string, keyof typeof Hugeicons> = {
-  linkedin: "Linkedin01",
-  github: "Github01",
-  twitter: "Twitter01",
-  facebook: "Facebook01",
-  instagram: "Instagram01",
-  website: "Globe01",
-  email: "Mail01",
-  phone: "Phone01",
-  youtube: "Youtube01",
-  whatsapp: "Whatsapp01",
-  telegram: "Telegram01",
-  default: "Link01",
+// Map to icon references
+const hugeiconMap: Record<string, any> = {
+  linkedin: Linkedin01Icon,
+  github: Github01Icon,
+  twitter: TwitterIcon,
+  facebook: Facebook01Icon,
+  instagram: InstagramIcon,
+  website: GlobeIcon,
+  email: Mail01Icon,
+  phone: PhoneCheckIcon,
+  youtube: YoutubeIcon,
+  whatsapp: WhatsappIcon,
+  telegram:   TelegramIcon,
+  default: LinkCircleIcon,
 };
 
-// Try to match by platform or url
 export function getHugeiconForLink(link: { platform?: string; url?: string }) {
-  if (!link) return Hugeicons[hugeiconMap.default];
+  if (!link) return hugeiconMap.default;
   const platform = link.platform?.toLowerCase() || "";
   const url = link.url?.toLowerCase() || "";
   for (const key of Object.keys(hugeiconMap)) {
     if (platform.includes(key) || url.includes(key)) {
-      return Hugeicons[hugeiconMap[key]];
+      return hugeiconMap[key];
     }
   }
-  return Hugeicons[hugeiconMap.default];
+  return hugeiconMap.default;
 }

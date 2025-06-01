@@ -6,8 +6,9 @@ import { getThemeById, availableThemes } from "@/types";
 import { cn } from "@/lib/utils";
 import { useProfile } from "@/contexts/profile-context";
 import { Skeleton } from "@/components/ui/skeleton";
-import { User } from "lucide-react";
-import { Globe } from "lucide-react";
+import { User, Globe } from "lucide-react";
+import { getHugeiconForLink } from "@/lib/hugeicon-map";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 export function CardPreview() {
   const { profile, loading: profileLoading, currentThemeId } = useProfile();
@@ -63,7 +64,7 @@ export function CardPreview() {
           )}
           {/* Professional & Education Details */}
           {profile.professionalDetails?.some((p) => p.isVisible) ||
-          profile.education.some((e) => e.isVisible) ? (
+            profile.education.some((e) => e.isVisible) ? (
             <div className="w-full mt-4 mb-2">
               <div className="border-l-4 border-primary pl-4 py-2 bg-primary/5 rounded-md">
                 {/* Professional Details */}
@@ -118,29 +119,32 @@ export function CardPreview() {
             </div>
           )}
 
-          {/* Links with static icon (Globe) */}
+          {/* Links with dynamic icons */}
           {profile.links.some((l) => l.isVisible) && (
             <div className="flex flex-col justify-center gap-2 mt-6">
               {profile.links
                 .filter((l) => l.isVisible)
-                .map((link) => (
-                  <a
-                    key={link.id}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full block px-5 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors shadow text-base font-semibold min-w-[120px] overflow-hidden"
-                    style={{ textAlign: 'left' }}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Globe className="h-5 w-5 shrink-0" />
-                      <span className="truncate">{link.label || link.platform}</span>
-                    </div>
-                    <div className="text-xs text-white/80 mt-0.5 truncate overflow-hidden whitespace-nowrap">
-                      {link.url}
-                    </div>
-                  </a>
-                ))}
+                .map((link) => {
+                  const iconRef = getHugeiconForLink(link);
+                  return (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full block px-5 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors shadow text-base font-semibold min-w-[120px] overflow-hidden"
+                      style={{ textAlign: 'left' }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <HugeiconsIcon icon={iconRef} className="h-5 w-5 shrink-0" />
+                        <span className="truncate">{link.label || link.platform}</span>
+                      </div>
+                      <div className="text-xs text-white/80 mt-0.5 truncate overflow-hidden whitespace-nowrap">
+                        {link.url}
+                      </div>
+                    </a>
+                  );
+                })}
             </div>
           )}
         </div>
