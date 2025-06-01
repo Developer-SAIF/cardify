@@ -29,6 +29,8 @@ export function ImageUploader({
     currentFieldValue
   );
   const [canChangeImage, setCanChangeImage] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     setPreviewUrl(currentFieldValue);
@@ -45,9 +47,12 @@ export function ImageUploader({
         return;
       }
       setPreviewUrl(undefined); // Optionally show a loading state
+      setIsUploading(true);
+      setUploadError(null);
       // Only allow file change if canChangeImage is true
       if (!canChangeImage && previewUrl) return;
       const imgbbUrl = await uploadToImgbb(file);
+      setIsUploading(false);
       if (imgbbUrl) {
         setPreviewUrl(imgbbUrl);
         form.setValue(fieldName, imgbbUrl, {
@@ -67,27 +72,60 @@ export function ImageUploader({
           })();
         }
       } else {
-        alert("Image upload failed. Please try again.");
+        setUploadError("Image upload failed or timed out. Please try again.");
       }
     }
   };
+
+  // Helper to add fetch timeout
+  function fetchWithTimeout(
+    resource: RequestInfo,
+    options: RequestInit = {},
+    timeout = 15000
+  ): Promise<Response> {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        reject(new Error("Request timed out"));
+      }, timeout);
+      fetch(resource, options)
+        .then((response) => {
+          clearTimeout(timer);
+          resolve(response);
+        })
+        .catch((err) => {
+          clearTimeout(timer);
+          reject(err);
+        });
+    });
+  }
 
   const uploadToImgbb = async (file: File): Promise<string | null> => {
     const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY; // Store your key in .env
     const formData = new FormData();
     formData.append("image", file);
-
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!res.ok) {
-      console.error("Failed to upload image:", res.statusText);
+    try {
+      const res = await fetchWithTimeout(
+        `https://api.imgbb.com/1/upload?key=${apiKey}`,
+        {
+          method: "POST",
+          body: formData,
+        },
+        15000 // 15 seconds timeout
+      );
+      if (!res.ok) {
+        console.error("Failed to upload image:", res.statusText);
+        return null;
+      }
+      const data = await res.json();
+      return data.data?.url || null;
+    } catch (err: any) {
+      if (err.message === "Request timed out") {
+        setUploadError("Image upload timed out. Please try again.");
+      } else {
+        setUploadError("Image upload failed. Please try again.");
+      }
       return null;
     }
-    const data = await res.json();
-    return data.data?.url || null;
   };
 
   const handleRemoveImage = () => {
@@ -101,6 +139,12 @@ export function ImageUploader({
       <Label htmlFor={fieldName} className="text-base font-semibold">
         {label}
       </Label>
+      {isUploading && (
+        <div className="text-sm text-muted-foreground">Uploading image...</div>
+      )}
+      {uploadError && (
+        <div className="text-sm text-red-500">{uploadError}</div>
+      )}
       {previewUrl && (
         <div
           className="relative mb-2 overflow-hidden rounded-lg shadow-md"

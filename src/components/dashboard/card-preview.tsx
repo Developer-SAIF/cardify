@@ -120,7 +120,7 @@ export function CardPreview() {
 
           {/* Links with static icon (Globe) */}
           {profile.links.some((l) => l.isVisible) && (
-            <div className="flex flex-wrap justify-center gap-3 mt-6">
+            <div className="flex flex-col justify-center gap-2 mt-6">
               {profile.links
                 .filter((l) => l.isVisible)
                 .map((link) => (
@@ -129,10 +129,16 @@ export function CardPreview() {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-5 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors shadow text-base font-semibold min-w-[120px] justify-center"
+                    className="w-full block px-5 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors shadow text-base font-semibold min-w-[120px] overflow-hidden"
+                    style={{ textAlign: 'left' }}
                   >
-                    <Globe className="h-5 w-5" />
-                    {link.label || link.platform}
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-5 w-5 shrink-0" />
+                      <span className="truncate">{link.label || link.platform}</span>
+                    </div>
+                    <div className="text-xs text-white/80 mt-0.5 truncate overflow-hidden whitespace-nowrap">
+                      {link.url}
+                    </div>
                   </a>
                 ))}
             </div>
