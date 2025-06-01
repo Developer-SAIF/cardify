@@ -1,7 +1,7 @@
 "use client";
 
 import type { UserProfile } from "@/types";
-import { initialProfileData, DEFAULT_THEME_ID } from "@/types";
+import { initialProfileData } from "@/types";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { createContext, useContext, useState, useEffect } from "react";
 
@@ -11,8 +11,6 @@ interface ProfileContextType {
   loading: boolean;
   login: (userId: string) => Promise<boolean>;
   logout: () => void;
-  currentThemeId: string;
-  setCurrentThemeId: Dispatch<SetStateAction<string>>;
 }
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
@@ -20,8 +18,6 @@ const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 export const ProfileProvider = ({ children }: { children: ReactNode }) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentThemeId, setCurrentThemeId] =
-    useState<string>(DEFAULT_THEME_ID);
 
   useEffect(() => {
     const storedUserId = localStorage.getItem("porichoyUserId");
@@ -31,7 +27,6 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
         .then((data) => {
           if (data) {
             setProfile(data);
-            setCurrentThemeId(data.theme);
           } else {
             localStorage.removeItem("porichoyUserId");
           }
@@ -42,20 +37,12 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // Removed useEffect that synced currentThemeId from profile.theme
-  // This was causing a loop with UserCardPage's context patching.
-  // setCurrentThemeId is already called appropriately:
-  // - on login
-  // - by ThemeSelector
-  // - by UserCardPage when it patches/restores context
-
   const login = async (userId: string): Promise<boolean> => {
     setLoading(true);
     const res = await fetch(`/api/user/${userId}`);
     if (res.ok) {
       const data = await res.json();
       setProfile(data);
-      setCurrentThemeId(data.theme);
       localStorage.setItem("porichoyUserId", userId);
       setLoading(false);
       return true;
@@ -67,7 +54,6 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     setProfile(null);
     localStorage.removeItem("porichoyUserId");
-    setCurrentThemeId(DEFAULT_THEME_ID);
   };
 
   return (
@@ -78,8 +64,6 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
         loading,
         login,
         logout,
-        currentThemeId,
-        setCurrentThemeId,
       }}
     >
       {children}

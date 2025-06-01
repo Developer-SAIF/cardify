@@ -2,7 +2,6 @@
 
 import { DEFAULT_PROFILE_PICTURE_URL } from "@/types";
 import Image from "next/image";
-import { getThemeById, availableThemes } from "@/types";
 import { cn } from "@/lib/utils";
 import { useProfile } from "@/contexts/profile-context";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,7 +10,7 @@ import { getHugeiconForLink } from "@/lib/hugeicon-map";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 export function CardPreview() {
-  const { profile, loading: profileLoading, currentThemeId } = useProfile();
+  const { profile, loading: profileLoading } = useProfile();
 
   if (profileLoading) {
     return <CardPreviewSkeleton />;
@@ -25,15 +24,11 @@ export function CardPreview() {
     );
   }
 
-  const theme = getThemeById(currentThemeId);
-  const cardThemeClass = theme.gradientClass;
-
   return (
     <div className="min-h-screen flex flex-col justify-center items-center py-10 px-2 bg-transparent">
       <div
         className={cn(
-          "w-full max-w-lg mx-auto rounded-3xl shadow-xl overflow-hidden h-full flex flex-col border-4",
-          theme.borderClass || "border-primary"
+          "w-full max-w-lg mx-auto rounded-3xl shadow-xl overflow-hidden h-full flex flex-col border-4 border-primary"
         )}
       >
         <div className="flex flex-col items-center p-10 pt-8 flex-1">
@@ -64,7 +59,7 @@ export function CardPreview() {
           )}
           {/* Professional & Education Details */}
           {profile.professionalDetails?.some((p) => p.isVisible) ||
-            profile.education.some((e) => e.isVisible) ? (
+          profile.education.some((e) => e.isVisible) ? (
             <div className="w-full mt-4 mb-2">
               <div className="border-l-4 border-primary pl-4 py-2 bg-primary/5 rounded-md">
                 {/* Professional Details */}
@@ -133,11 +128,16 @@ export function CardPreview() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full block px-5 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors shadow text-base font-semibold min-w-[120px] overflow-hidden"
-                      style={{ textAlign: 'left' }}
+                      style={{ textAlign: "left" }}
                     >
                       <div className="flex items-center gap-2">
-                        <HugeiconsIcon icon={iconRef} className="h-5 w-5 shrink-0" />
-                        <span className="truncate">{link.label || link.platform}</span>
+                        <HugeiconsIcon
+                          icon={iconRef}
+                          className="h-5 w-5 shrink-0"
+                        />
+                        <span className="truncate">
+                          {link.label || link.platform}
+                        </span>
                       </div>
                       <div className="text-xs text-white/80 mt-0.5 truncate overflow-hidden whitespace-nowrap">
                         {link.url}
@@ -154,12 +154,10 @@ export function CardPreview() {
 }
 
 function CardPreviewSkeleton() {
-  const theme = availableThemes[0]; // Default theme for skeleton
   return (
     <div
       className={cn(
-        "w-full max-w-md mx-auto rounded-xl shadow-2xl overflow-hidden text-white p-1",
-        theme.gradientClass
+        "w-full max-w-md mx-auto rounded-xl shadow-2xl overflow-hidden text-white p-1 bg-gradient-to-br from-blue-600 to-teal-500"
       )}
     >
       <div className="bg-background/80 backdrop-blur-md rounded-lg p-6 space-y-6">

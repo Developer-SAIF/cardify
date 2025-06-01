@@ -91,7 +91,6 @@ export interface UserProfile {
   skills: Skill[];
   education: EducationEntry[];
   links: SocialLink[];
-  theme: string; // Theme ID
   professionalDetails: ProfessionalDetail[];
 
   showHeadline: boolean;
@@ -101,53 +100,6 @@ export interface UserProfile {
   showContactEmail: boolean;
   showContactPhone: boolean;
 }
-
-export const DEFAULT_THEME_ID = "ocean-blue";
-
-export const availableThemes: Array<{
-  id: string;
-  name: string;
-  gradientClass: string;
-  previewClass: string;
-  borderClass?: string;
-}> = [
-  {
-    id: "ocean-blue",
-    name: "Ocean Blue",
-    gradientClass: "bg-gradient-to-br from-blue-600 to-teal-500",
-    previewClass: "from-blue-600 to-teal-500",
-  },
-  {
-    id: "sunset-orange",
-    name: "Sunset Orange",
-    gradientClass: "bg-gradient-to-br from-orange-500 to-red-600",
-    previewClass: "from-orange-500 to-red-600",
-  },
-  {
-    id: "spring-green",
-    name: "Spring Green",
-    gradientClass: "bg-gradient-to-br from-green-500 to-lime-500",
-    previewClass: "from-green-500 to-lime-500",
-  },
-  {
-    id: "royal-purple",
-    name: "Royal Purple",
-    gradientClass: "bg-gradient-to-br from-purple-600 to-indigo-700",
-    previewClass: "from-purple-600 to-indigo-700",
-  },
-  {
-    id: "desert-gold",
-    name: "Desert Gold",
-    gradientClass: "bg-gradient-to-br from-yellow-400 to-amber-500",
-    previewClass: "from-yellow-400 to-amber-500",
-  },
-  {
-    id: "midnight-sky",
-    name: "Midnight Sky",
-    gradientClass: "bg-gradient-to-br from-gray-800 to-slate-900",
-    previewClass: "from-gray-800 to-slate-900",
-  },
-];
 
 export const initialProfileData: UserProfile = {
   userId: "12345",
@@ -205,7 +157,6 @@ export const initialProfileData: UserProfile = {
       isVisible: false,
     },
   ],
-  theme: DEFAULT_THEME_ID,
   showHeadline: true,
   showProfession: true,
   showCompany: true,
@@ -213,8 +164,4 @@ export const initialProfileData: UserProfile = {
   showContactEmail: true,
   showContactPhone: true,
   professionalDetails: [],
-};
-
-export const getThemeById = (themeId: string) => {
-  return availableThemes.find((t) => t.id === themeId) || availableThemes[0];
 };

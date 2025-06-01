@@ -50,7 +50,6 @@ export const userProfileSchema = z.object({
   skills: z.array(skillSchema),
   education: z.array(educationEntrySchema),
   links: z.array(socialLinkSchema),
-  theme: z.string().min(1, "Theme is required"),
   professionalDetails: z.array(professionalDetailSchema),
 
   showHeadline: z.boolean(),

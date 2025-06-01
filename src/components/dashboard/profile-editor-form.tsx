@@ -21,7 +21,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useProfile } from "@/contexts/profile-context";
 import type { UserProfile, SocialLink, Skill, EducationEntry } from "@/types";
 import { ImageUploader } from "./image-uploader";
-import { ThemeSelector } from "./theme-selector";
 import { EditableSection } from "./editable-section";
 import { DynamicListEditor } from "./dynamic-list-editor";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -76,11 +75,7 @@ export function ProfileEditorForm({
   function mapProfileToFormData(profileData: UserProfile): UserProfileFormData {
     return {
       ...profileData,
-      headline: profileData.headline || "",
-      professionalDetails: profileData.professionalDetails || [],
-      profilePictureUrl: profileData.profilePictureUrl || "",
-      contactEmail: profileData.contactEmail || "",
-      contactPhone: profileData.contactPhone || "",
+      // Remove any forced empty/default values here to preserve previous info
     };
   }
 
@@ -325,7 +320,7 @@ export function ProfileEditorForm({
         </Card>
 
         <Separator />
-        <ThemeSelector />
+        {/* Remove the ThemeSelector component usage */}
 
         {/* Floating Save/Preview Buttons for mobile */}
         {isMobile ? (
