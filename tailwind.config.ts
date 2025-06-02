@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -11,6 +10,10 @@ export default {
   ],
   theme: {
   	extend: {
+  		screens: {
+  			'custom-md': '1428px',
+  			'custom-lg': '1600px',
+  		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
