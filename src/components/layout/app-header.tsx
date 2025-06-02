@@ -17,15 +17,19 @@ export function AppHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
-        <Link href="/" className="mr-6 flex items-center">
+      <div className="w-full flex items-center h-16 px-4 sm:px-8">
+        {/* Logo with left padding, always left-aligned */}
+        <Link href="/" className="flex items-center pl-2 sm:pl-4">
           <img
             src="/logo.png"
             alt="Porichoy Logo"
-            className="h-20 w-20 object-contain"
+            className="h-14 w-14 object-contain" // Increased size
           />
         </Link>
-        <nav className="flex flex-1 items-center space-x-4 sm:justify-end">
+        {/* Spacer to push menu to the right */}
+        <div className="flex-1" />
+        {/* Menu, right-aligned with right padding */}
+        <nav className="flex items-center space-x-2 pr-2 sm:pr-4">
           {profile ? (
             <>
               <Button
