@@ -19,11 +19,11 @@ export function AppHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="w-full flex items-center h-16 px-4 sm:px-8">
         {/* Logo with left padding, always left-aligned */}
-        <Link href="/" className="flex items-center pl-2 sm:pl-4">
+        <Link href="/" className="flex items-center pl-4 sm:pl-8 lg:pl-12">
           <img
             src="/logo.png"
             alt="Porichoy Logo"
-            className="h-14 w-14 object-contain" // Increased size
+            className="h-20 w-20 object-contain" // Increased size
           />
         </Link>
         {/* Spacer to push menu to the right */}
