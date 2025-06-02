@@ -5,9 +5,10 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useProfile } from "@/contexts/profile-context";
 import { Skeleton } from "@/components/ui/skeleton";
-import { User, Globe } from "lucide-react";
+import { User } from "lucide-react";
 import { getHugeiconForLink } from "@/lib/hugeicon-map";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { SkillsSlider } from "./skills-slider";
 
 export function CardPreview() {
   const { profile, loading: profileLoading } = useProfile();
@@ -25,15 +26,30 @@ export function CardPreview() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center py-10 px-2 bg-transparent">
+    <div className="min-h-screen w-full flex flex-col justify-center items-center py-6 px-2 sm:py-10 sm:px-4 bg-transparent">
       <div
         className={cn(
-          "w-full max-w-lg mx-auto rounded-3xl shadow-xl overflow-hidden h-full flex flex-col border-4 border-primary"
+          "w-full max-w-lg rounded-3xl shadow-xl overflow-hidden flex flex-col border-4 border-primary bg-background"
         )}
       >
-        <div className="flex flex-col items-center p-10 pt-8 flex-1">
+        <div className="flex flex-col items-center p-2 sm:p-4 sm:pt-8 w-full overflow-hidden">
+          {/* Cover Photo Section */}
+          {profile.coverPhotoUrl && (
+            <div className="relative w-full h-32 sm:h-40 -mx-6 mb-4 rounded-t-3xl overflow-hidden">
+              <Image
+                src={profile.coverPhotoUrl}
+                alt="Cover Photo"
+                fill
+                style={{ objectFit: "cover" }}
+                className="bg-muted"
+                data-ai-hint="profile cover"
+                priority
+              />
+            </div>
+          )}
+
           {/* Profile Picture */}
-          <div className="relative w-32 h-32 rounded-full border-4 border-white dark:border-neutral-900 shadow-lg overflow-hidden bg-muted mb-4">
+          <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white dark:border-neutral-900 shadow-lg overflow-hidden bg-muted mb-4">
             {profile.profilePictureUrl ? (
               <Image
                 src={profile.profilePictureUrl || DEFAULT_PROFILE_PICTURE_URL}
@@ -48,36 +64,38 @@ export function CardPreview() {
               </div>
             )}
           </div>
+
           {/* Name & Headline */}
-          <h1 className="text-4xl font-extrabold text-neutral-900 dark:text-white mt-2 tracking-tight text-center">
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-neutral-900 dark:text-white mt-2 tracking-tight text-center break-words">
             {profile.firstName} {profile.lastName}
           </h1>
+
           {profile.showHeadline && profile.headline && (
-            <p className="text-lg text-neutral-600 dark:text-neutral-300 mt-2 text-center font-medium">
+            <p className="text-base sm:text-lg text-neutral-600 dark:text-neutral-300 mt-2 text-center font-medium break-words px-1">
               {profile.headline}
             </p>
           )}
+
           {/* Professional & Education Details */}
-          {profile.professionalDetails?.some((p) => p.isVisible) ||
-          profile.education.some((e) => e.isVisible) ? (
+          {(profile.professionalDetails?.some((p) => p.isVisible) ||
+            profile.education.some((e) => e.isVisible)) && (
             <div className="w-full mt-4 mb-2">
               <div className="border-l-4 border-primary pl-4 py-2 bg-primary/5 rounded-md">
-                {/* Professional Details */}
                 {profile.professionalDetails
                   ?.filter((p) => p.isVisible)
                   .map((prof) => (
                     <div
                       key={prof.id}
-                      className="text-neutral-700 dark:text-neutral-200 text-base text-left mb-1"
+                      className="text-neutral-700 dark:text-neutral-200 text-base text-left mb-1 break-words"
                     >
                       <span className="font-medium">{prof.profession}</span>
                       {prof.company && <span> at {prof.company}</span>}
                       {prof.location && <span>, {prof.location}</span>}
                     </div>
                   ))}
-                {/* Education Details */}
+
                 {profile.education.some((e) => e.isVisible) && (
-                  <div className="text-neutral-600 dark:text-neutral-300 text-base text-left space-y-1 mt-2">
+                  <div className="text-neutral-600 dark:text-neutral-300 text-base text-left space-y-1 mt-2 break-words">
                     {profile.education
                       .filter((e) => e.isVisible)
                       .map((edu) => (
@@ -91,32 +109,25 @@ export function CardPreview() {
                 )}
               </div>
             </div>
-          ) : null}
+          )}
 
-          {/* Skills */}
+          {/* Skills Slider */}
           {profile.skills.some((s) => s.isVisible) && (
             <div className="w-full mt-8">
               <h3 className="text-xs font-semibold mb-2 uppercase tracking-wider text-primary text-center">
                 Skills
               </h3>
-              <div className="flex flex-wrap justify-center gap-2">
-                {profile.skills
+              <SkillsSlider
+                skills={profile.skills
                   .filter((s) => s.isVisible)
-                  .map((skill) => (
-                    <span
-                      key={skill.id}
-                      className="px-4 py-1 text-sm bg-primary/10 text-primary rounded-full font-semibold"
-                    >
-                      {skill.name}
-                    </span>
-                  ))}
-              </div>
+                  .map((s) => s.name)}
+              />
             </div>
           )}
 
           {/* Links with dynamic icons */}
           {profile.links.some((l) => l.isVisible) && (
-            <div className="flex flex-col justify-center gap-2 mt-6">
+            <div className="flex flex-col justify-center gap-2 mt-6 w-full">
               {profile.links
                 .filter((l) => l.isVisible)
                 .map((link) => {
@@ -127,19 +138,18 @@ export function CardPreview() {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full block px-5 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors shadow text-base font-semibold min-w-[120px] overflow-hidden"
-                      style={{ textAlign: "left" }}
+                      className="w-full block px-4 py-2 rounded-md bg-primary text-white hover:bg-primary/90 transition-colors shadow text-base font-semibold overflow-hidden"
                     >
                       <div className="flex items-center gap-2">
                         <HugeiconsIcon
                           icon={iconRef}
                           className="h-5 w-5 shrink-0"
                         />
-                        <span className="truncate">
+                        <span className="truncate break-words">
                           {link.label || link.platform}
                         </span>
                       </div>
-                      <div className="text-xs text-white/80 mt-0.5 truncate overflow-hidden whitespace-nowrap">
+                      <div className="text-xs text-white/80 mt-0.5 truncate">
                         {link.url}
                       </div>
                     </a>

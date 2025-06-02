@@ -28,6 +28,7 @@ import { Separator } from "@/components/ui/separator";
 import { v4 as uuidv4 } from "uuid"; // For generating unique IDs
 import { Eye, Loader2 } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
+import { useRouter } from "next/navigation";
 
 interface ProfileEditorFormProps {
   isMobile?: boolean;
@@ -42,6 +43,7 @@ export function ProfileEditorForm({
 }: ProfileEditorFormProps) {
   const { profile, setProfile: setProfileContext, loading } = useProfile();
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<UserProfileFormData>({
     resolver: zodResolver(userProfileSchema),
@@ -141,9 +143,9 @@ export function ProfileEditorForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 p-4 md:p-6 lg:p-8"
+        className="space-y-8 p-2 sm:p-4 md:p-6 lg:p-8 max-w-full"
       >
-        <Card>
+        <Card className="w-full max-w-2xl mx-auto">
           <CardHeader>
             <CardTitle>Basic Information</CardTitle>
           </CardHeader>
@@ -183,6 +185,14 @@ export function ProfileEditorForm({
               aspectRatio="1/1"
               dataAiHint="profile avatar"
             />
+            {/* Cover Photo Upload */}
+            <ImageUploader
+              form={form}
+              fieldName="coverPhotoUrl"
+              label="Cover Photo"
+              aspectRatio="16/5"
+              dataAiHint="profile cover"
+            />
           </CardContent>
         </Card>
 
@@ -210,7 +220,7 @@ export function ProfileEditorForm({
         </EditableSection>
 
         <Separator />
-        <Card>
+        <Card className="w-full max-w-2xl mx-auto">
           <CardHeader>
             <CardTitle>Professional Details</CardTitle>
           </CardHeader>
@@ -253,7 +263,7 @@ export function ProfileEditorForm({
         </Card>
 
         <Separator />
-        <Card>
+        <Card className="w-full max-w-2xl mx-auto">
           <CardHeader>
             <CardTitle>Education</CardTitle>
           </CardHeader>
@@ -286,7 +296,7 @@ export function ProfileEditorForm({
         </Card>
 
         <Separator />
-        <Card>
+        <Card className="w-full max-w-2xl mx-auto">
           <CardHeader>
             <CardTitle>Links</CardTitle>
           </CardHeader>
@@ -324,7 +334,7 @@ export function ProfileEditorForm({
 
         {/* Floating Save/Preview Buttons for mobile */}
         {isMobile ? (
-          <div className="pt-6 floating-save-btn flex gap-2 w-full">
+          <div className="pt-6 floating-save-btn flex gap-2 w-full max-w-full">
             <Button
               type="submit"
               className="w-1/2"
@@ -348,7 +358,13 @@ export function ProfileEditorForm({
                 type="button"
                 className="w-1/2 bg-secondary text-primary border border-primary hover:bg-primary hover:text-white"
                 size="lg"
-                onClick={() => setShowPreview && setShowPreview(true)}
+                onClick={() => {
+                  if (profile?.userId) {
+                    router.push(`/card/${profile.userId}`);
+                  } else if (setShowPreview) {
+                    setShowPreview(true);
+                  }
+                }}
                 aria-pressed={!!showPreview}
               >
                 <Eye className="mr-2 h-5 w-5" /> Live Preview
@@ -356,7 +372,7 @@ export function ProfileEditorForm({
             )}
           </div>
         ) : (
-          <div className="pt-6 floating-save-btn">
+          <div className="pt-6 floating-save-btn w-full max-w-2xl mx-auto">
             <Button
               type="submit"
               className="w-full md:w-auto"

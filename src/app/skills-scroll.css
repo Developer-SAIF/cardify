@@ -1,0 +1,38 @@
+/* Horizontal auto-scrolling skills slider */
+.skills-slider-outer {
+  width: 100%;
+  overflow: hidden;
+  background: var(--card, #fff);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 0.5rem 0;
+}
+.skills-slider-inner {
+  display: flex;
+  gap: 2rem;
+  white-space: nowrap;
+  overflow-x: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: auto;
+}
+.skills-slider-inner::-webkit-scrollbar {
+  display: none;
+}
+.skill-item {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  background: var(--accent, #FFC107);
+  color: var(--accent-foreground, #222);
+  border-radius: 999px;
+  font-weight: 500;
+  font-size: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: background 0.2s;
+  margin: 0.25rem 0;
+  user-select: none;
+}
+.skill-item:hover {
+  background: var(--primary, #3B82F6);
+  color: var(--primary-foreground, #fff);
+}

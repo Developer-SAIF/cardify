@@ -92,6 +92,7 @@ export interface UserProfile {
   education: EducationEntry[];
   links: SocialLink[];
   professionalDetails: ProfessionalDetail[];
+  coverPhotoUrl?: string;
 
   showHeadline: boolean;
   showProfession: boolean;
@@ -164,4 +165,5 @@ export const initialProfileData: UserProfile = {
   showContactEmail: true,
   showContactPhone: true,
   professionalDetails: [],
+  coverPhotoUrl: undefined, // Default to undefined
 };

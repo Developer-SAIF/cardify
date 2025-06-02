@@ -43,23 +43,23 @@ export function DynamicListEditor<TItem extends DynamicListItem, TFormValues ext
   const { fields, append, remove, update } = fieldArray;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full">
       {fields.map((item, index) => (
-        <Card key={item.id} className={cn("overflow-hidden shadow-md", itemClassName)}>
-          <CardContent className="p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <h4 className="font-semibold text-foreground">
-                {item[itemTitleKey as string] || `${listName.slice(0, -1)} ${index + 1}`}
+        <Card key={item.id} className={cn("overflow-hidden shadow-md w-full", itemClassName)}>
+          <CardContent className="p-2 sm:p-4 space-y-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+              <h4 className="font-semibold text-foreground break-words">
+                {(item as any)[itemTitleKey as string] || `${listName.slice(0, -1)} ${index + 1}`}
               </h4>
               <div className="flex items-center space-x-2">
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  onClick={() => update(index, { ...item, isVisible: !item.isVisible } as any)}
-                  title={item.isVisible ? "Hide" : "Show"}
+                  onClick={() => update(index, { ...(item as any), isVisible: !(item as any).isVisible } as any)}
+                  title={(item as any).isVisible ? "Hide" : "Show"}
                 >
-                  {item.isVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
+                  {(item as any).isVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
                 </Button>
                 <Button
                   type="button"
@@ -72,17 +72,16 @@ export function DynamicListEditor<TItem extends DynamicListItem, TFormValues ext
                 </Button>
               </div>
             </div>
-
             {fieldsConfig.map(fieldConf => (
-              <div key={String(fieldConf.name)} className="space-y-1">
+              <div key={String(fieldConf.name)} className="space-y-1 w-full">
                 <Label htmlFor={`${listName}.${index}.${String(fieldConf.name)}`}>{fieldConf.label}</Label>
                 <Input
                   id={`${listName}.${index}.${String(fieldConf.name)}`}
-                  // @ts-ignore // TODO: Fix type for register path
+                  // @ts-ignore
                   {...control.register(`${listName}.${index}.${String(fieldConf.name)}`)}
                   placeholder={fieldConf.placeholder}
                   type={fieldConf.type || "text"}
-                  className="text-sm"
+                  className="text-sm w-full"
                 />
               </div>
             ))}

@@ -13,13 +13,13 @@ export default function DashboardPage() {
   const [showPreview, setShowPreview] = useState(false);
 
   return (
-    <div className="container mx-auto py-4 px-2 md:px-4">
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-8 min-h-[calc(100vh-var(--header-height,4rem)-2rem)]">
+    <div className="w-full min-h-screen py-2 px-2 md:px-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-2 min-h-[calc(100vh-var(--header-height,3rem)-2rem)] w-full">
         {/* Editor Panel */}
         <div
-          className={`md:col-span-7 lg:col-span-8 ${
+          className={`${
             isMobile ? (showPreview ? "hidden" : "block") : "block"
-          }`}
+          } flex flex-col w-full h-full`}
         >
           <ScrollArea className="h-[calc(100vh-var(--header-height,4rem)-2rem-2rem)] md:pr-4">
             <h1 className="text-3xl font-bold tracking-tight mb-6 text-foreground">
@@ -34,9 +34,9 @@ export default function DashboardPage() {
         </div>
         {/* Preview Panel */}
         <div
-          className={`md:col-span-5 lg:col-span-4 ${
+          className={`${
             isMobile ? (showPreview ? "block" : "hidden") : "block"
-          }`}
+          } flex flex-col w-full h-full`}
         >
           <div className="sticky top-[calc(var(--header-height,4rem)+1rem)]">
             <h2 className="text-2xl font-semibold tracking-tight mb-4 text-foreground">

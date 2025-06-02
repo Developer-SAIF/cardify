@@ -11,7 +11,7 @@ import { useState, useEffect } from "react";
 
 interface ImageUploaderProps {
   form: UseFormReturn<UserProfileFormData>;
-  fieldName: "profilePictureUrl";
+  fieldName: "profilePictureUrl" | "coverPhotoUrl";
   label: string;
   aspectRatio?: string; // e.g. "1/1" for square
   dataAiHint?: string;

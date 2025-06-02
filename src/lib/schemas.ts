@@ -45,6 +45,11 @@ export const userProfileSchema = z.object({
     .url("Must be a valid URL for profile picture")
     .or(z.literal("")) // allow empty string
     .optional(),
+  coverPhotoUrl: z
+    .string()
+    .url("Must be a valid URL for cover photo")
+    .or(z.literal("")) // allow empty string
+    .optional(),
   contactEmail: z.string().email("Invalid email address").optional(),
   contactPhone: z.string().optional(), // Add more specific phone validation if needed
   skills: z.array(skillSchema),
