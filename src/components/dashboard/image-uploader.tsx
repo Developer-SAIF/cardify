@@ -37,46 +37,6 @@ export function ImageUploader({
     setCanChangeImage(false); // Reset when value changes
   }, [currentFieldValue]);
 
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 32 * 1024 * 1024) {
-        alert("Image size must be 32MB or less.");
-        return;
-      }
-      setPreviewUrl(undefined); // Optionally show a loading state
-      setIsUploading(true);
-      setUploadError(null);
-      // Only allow file change if canChangeImage is true
-      if (!canChangeImage && previewUrl) return;
-      const imgbbUrl = await uploadToImgbb(file);
-      setIsUploading(false);
-      if (imgbbUrl) {
-        setPreviewUrl(imgbbUrl);
-        form.setValue(fieldName, imgbbUrl, {
-          shouldValidate: true,
-          shouldDirty: true,
-        });
-        await form.trigger(fieldName); // Ensure form state is updated
-        setCanChangeImage(false); // Reset after change
-        // Automatically save profile after image upload
-        if (form.handleSubmit) {
-          form.handleSubmit(async (data) => {
-            if (typeof window !== "undefined") {
-              // Find the closest form element and submit it
-              const formEl = document.querySelector("form");
-              if (formEl) formEl.requestSubmit();
-            }
-          })();
-        }
-      } else {
-        setUploadError("Image upload failed or timed out. Please try again.");
-      }
-    }
-  };
-
   // Helper to add fetch timeout
   function fetchWithTimeout(
     resource: RequestInfo,
@@ -128,6 +88,120 @@ export function ImageUploader({
     }
   };
 
+  // Helper to process image to required aspect ratio and size
+  async function processImage(
+    file: File,
+    targetWidth: number,
+    targetHeight: number,
+    aspectRatio: string
+  ): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const img = new window.Image();
+      img.onload = () => {
+        // Calculate cropping
+        const inputAspect = img.width / img.height;
+        const [arW, arH] = aspectRatio.split("/").map(Number);
+        const outputAspect = arW / arH;
+        let sx = 0,
+          sy = 0,
+          sw = img.width,
+          sh = img.height;
+        if (inputAspect > outputAspect) {
+          // Crop width
+          sw = img.height * outputAspect;
+          sx = (img.width - sw) / 2;
+        } else if (inputAspect < outputAspect) {
+          // Crop height
+          sh = img.width / outputAspect;
+          sy = (img.height - sh) / 2;
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("Canvas not supported"));
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, targetWidth, targetHeight);
+        canvas.toBlob(
+          (blob) => {
+            if (blob) resolve(blob);
+            else reject(new Error("Image processing failed"));
+          },
+          "image/jpeg",
+          0.85 // quality
+        );
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 32 * 1024 * 1024) {
+        alert("Image size must be 32MB or less.");
+        return;
+      }
+      setPreviewUrl(undefined); // Optionally show a loading state
+      setIsUploading(true);
+      setUploadError(null);
+      // Only allow file change if canChangeImage is true
+      if (!canChangeImage && previewUrl) return;
+      // Determine target size and aspect ratio
+      let targetWidth = 1280,
+        targetHeight = 400,
+        ar = aspectRatio || "16/9";
+      if (fieldName === "profilePictureUrl") {
+        targetWidth = 400;
+        targetHeight = 400;
+        ar = "1/1";
+      } else if (fieldName === "coverPhotoUrl") {
+        targetWidth = 1280;
+        targetHeight = 400;
+        ar = "16/5";
+      }
+      try {
+        const processedBlob = await processImage(
+          file,
+          targetWidth,
+          targetHeight,
+          ar
+        );
+        const processedFile = new File([processedBlob], file.name, {
+          type: "image/jpeg",
+        });
+        const imgbbUrl = await uploadToImgbb(processedFile);
+        setIsUploading(false);
+        if (imgbbUrl) {
+          setPreviewUrl(imgbbUrl);
+          form.setValue(fieldName, imgbbUrl, {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+          await form.trigger(fieldName); // Ensure form state is updated
+          setCanChangeImage(false); // Reset after change
+          // Automatically save profile after image upload
+          if (form.handleSubmit) {
+            form.handleSubmit(async (data) => {
+              if (typeof window !== "undefined") {
+                // Find the closest form element and submit it
+                const formEl = document.querySelector("form");
+                if (formEl) formEl.requestSubmit();
+              }
+            })();
+          }
+        } else {
+          setUploadError("Image upload failed or timed out. Please try again.");
+        }
+      } catch (err) {
+        setIsUploading(false);
+        setUploadError("Image processing failed. Please try again.");
+      }
+    }
+  };
+
   const handleRemoveImage = () => {
     setPreviewUrl(undefined);
     form.setValue(fieldName, "");
@@ -139,12 +213,22 @@ export function ImageUploader({
       <Label htmlFor={fieldName} className="text-base font-semibold">
         {label}
       </Label>
+      {/* Recommendation message for image ratio */}
+      {fieldName === "profilePictureUrl" && (
+        <div className="text-xs text-muted-foreground">
+          Recommended: Upload a square (1:1 ratio) profile picture for best
+          results.
+        </div>
+      )}
+      {fieldName === "coverPhotoUrl" && (
+        <div className="text-xs text-muted-foreground">
+          Recommended: Upload a wide (16:5 ratio) cover photo for best results.
+        </div>
+      )}
       {isUploading && (
         <div className="text-sm text-muted-foreground">Uploading image...</div>
       )}
-      {uploadError && (
-        <div className="text-sm text-red-500">{uploadError}</div>
-      )}
+      {uploadError && <div className="text-sm text-red-500">{uploadError}</div>}
       {previewUrl && (
         <div
           className="relative mb-2 overflow-hidden rounded-lg shadow-md"
