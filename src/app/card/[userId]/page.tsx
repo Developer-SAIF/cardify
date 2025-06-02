@@ -1,14 +1,19 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { CardPreview } from "@/components/dashboard/card-preview";
-import { useProfile } from "@/contexts/profile-context";
-import type { UserProfile } from "@/types";
-import { initialProfileData } from "@/types";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useProfile } from "@/contexts/profile-context";
+import type { UserProfile } from "@/types";
+import { initialProfileData } from "@/types";
+
+// Dynamic import for better code-splitting
+const CardPreview = dynamic(() =>
+  import("@/components/dashboard/card-preview").then((mod) => mod.CardPreview)
+);
 
 export default function UserCardPage() {
   const params = useParams();

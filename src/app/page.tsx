@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CreditCard, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 export default function HomePage() {
   const router = useRouter();
@@ -37,28 +37,23 @@ export default function HomePage() {
   // If user is not logged in, show the login form
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      <div className="mb-8 flex flex-col items-center text-center">
-        <CreditCard className="h-12 w-12 text-primary mb-4" />
-        <h1 className="text-4xl font-bold tracking-tight text-primary">
-          Porichoy
-        </h1>
-        <p className="text-muted-foreground">
-          Your Digital Business Card Solution
-        </p>
+      <div className="flex flex-col items-center text-center">
+        <img
+          src="/logo.png"
+          alt="Porichoy Logo"
+          className="h-[200px] w-[200px] object-contain"
+        />
       </div>
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Access Your Porichoy</CardTitle>
-          <CardDescription>
-            Enter your unique User ID to access your dashboard or view a demo.
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <LoginForm />
         </CardContent>
       </Card>
       <p className="mt-6 text-center text-sm text-muted-foreground">
-        This is a demo. Try User ID: <strong>12345</strong> to log in.
+        Try User ID: <strong>12345</strong> to log into the demo account.
         <br />
         Or,{" "}
         <a href="/card/12345" className="underline hover:text-primary">

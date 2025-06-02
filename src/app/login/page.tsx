@@ -6,19 +6,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CreditCard } from "lucide-react";
 
 export default function LoginPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      <div className="mb-8 flex flex-col items-center text-center">
-        <CreditCard className="h-12 w-12 text-primary mb-4" />
-        <h1 className="text-4xl font-bold tracking-tight text-primary">
-          Porichoy
-        </h1>
-        <p className="text-muted-foreground">
-          Your Digital Business Card Solution
-        </p>
+      <div className="mb-8 flex flex-col items-center text-center w-full">
+        <img
+          src="/logo.png"
+          alt="Porichoy Logo"
+          className="h-12 w-12 mb-4 object-contain"
+        />
       </div>
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
