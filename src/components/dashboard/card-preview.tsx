@@ -34,20 +34,22 @@ export function CardPreview() {
       >
         <div className="flex flex-col items-stretch p-2 sm:p-4 sm:pt-8 w-full overflow-hidden">
           {/* Cover Photo & Profile Picture Overlap Section */}
-          <div className="relative w-full h-32 sm:h-40 -mx-6 mb-4 rounded-t-3xl overflow-visible">
+          <div className="relative w-full h-32 sm:h-40 mb-0 rounded-t-3xl overflow-hidden">
             {profile.coverPhotoUrl && (
               <Image
                 src={profile.coverPhotoUrl}
                 alt="Cover Photo"
                 fill
                 style={{ objectFit: "cover" }}
-                className="bg-muted"
+                className="bg-muted w-full h-full object-cover"
                 data-ai-hint="profile cover"
                 priority
               />
             )}
-            {/* Profile Picture Overlapping Cover Photo */}
-            <div className="absolute left-6 bottom-0 translate-y-1/2 w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white dark:border-neutral-900 shadow-lg overflow-hidden bg-muted">
+          </div>
+          {/* Profile Picture - outer layer, overlapping card bottom edge */}
+          <div className="relative w-full flex justify-start" style={{ height: 0 }}>
+            <div className="absolute left-6 -bottom-12 w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white dark:border-neutral-900 shadow-lg overflow-hidden bg-muted z-10">
               {profile.profilePictureUrl ? (
                 <Image
                   src={profile.profilePictureUrl || DEFAULT_PROFILE_PICTURE_URL}
@@ -63,7 +65,7 @@ export function CardPreview() {
               )}
             </div>
           </div>
-          {/* Add padding below the cover/profile section for spacing */}
+          {/* Add padding below the profile picture for spacing */}
           <div className="pt-16 sm:pt-20" />
 
           {/* Name & Headline */}
