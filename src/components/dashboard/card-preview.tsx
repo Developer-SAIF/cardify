@@ -13,7 +13,8 @@ import { useState } from "react";
 
 export function CardPreview({
   hideShareLink = false,
-}: { hideShareLink?: boolean } = {}) {
+  dashboardPreview = false,
+}: { hideShareLink?: boolean; dashboardPreview?: boolean } = {}) {
   const { profile, loading: profileLoading } = useProfile();
 
   if (profileLoading) {
@@ -46,7 +47,13 @@ export function CardPreview({
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col justify-center items-center py-6 px-2 sm:py-10 sm:px-4 bg-transparent">
+    <div
+      className={cn(
+        dashboardPreview
+          ? "w-full flex flex-col justify-center items-center py-6 px-2 sm:py-10 sm:px-4 bg-transparent"
+          : "min-h-screen w-full flex flex-col justify-center items-center py-6 px-2 sm:py-10 sm:px-4 bg-transparent"
+      )}
+    >
       <div
         className={cn(
           // Add gradient background, hover effect, and more rounded corners

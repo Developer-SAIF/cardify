@@ -13,7 +13,7 @@ export default function DashboardPage() {
   const [showPreview, setShowPreview] = useState(false);
 
   return (
-    <div className="w-full min-h-screen py-2 px-2">
+    <div className="w-full py-2 px-2">
       {/* Only show one panel at a time based on showPreview */}
       <div className="flex flex-col w-full h-full">
         {!showPreview ? (
@@ -28,11 +28,8 @@ export default function DashboardPage() {
             />
           </ScrollArea>
         ) : (
-          <div
-            className="h-[calc(100vh-var(--header-height,4rem)-2rem-2rem)] flex items-center justify-center"
-            style={{ position: 'relative', top: 'var(--header-height,4rem)' }}
-          >
-            <CardPreview />
+          <div className="flex items-center justify-center w-full h-full pt-16">
+            <CardPreview dashboardPreview />
           </div>
         )}
       </div>
