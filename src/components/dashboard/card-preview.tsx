@@ -9,6 +9,7 @@ import { User } from "lucide-react";
 import { getHugeiconForLink } from "@/lib/hugeicon-map";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { SkillsSlider } from "./skills-slider";
+import { useState } from "react";
 
 export function CardPreview() {
   const { profile, loading: profileLoading } = useProfile();
@@ -24,6 +25,23 @@ export function CardPreview() {
       </div>
     );
   }
+
+  // Show shareable link using shortId
+  const shortId = profile.shortId;
+  const shareUrl = `${
+    typeof window !== "undefined" ? window.location.origin : ""
+  }/card/${shortId}`;
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   return (
     <div className="min-h-screen w-full flex flex-col justify-center items-center py-6 px-2 sm:py-10 sm:px-4 bg-transparent">
@@ -48,7 +66,10 @@ export function CardPreview() {
             )}
           </div>
           {/* Profile Picture - outer layer, overlapping card bottom edge */}
-          <div className="relative w-full flex justify-start" style={{ height: 0 }}>
+          <div
+            className="relative w-full flex justify-start"
+            style={{ height: 0 }}
+          >
             <div className="absolute left-6 -bottom-12 w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white dark:border-neutral-900 shadow-lg overflow-hidden bg-muted z-10">
               {profile.profilePictureUrl ? (
                 <Image
@@ -159,6 +180,31 @@ export function CardPreview() {
                 })}
             </div>
           )}
+
+          {/* Shareable Link Section */}
+          <div className="flex flex-col items-center mt-6 mb-2">
+            <span className="text-xs text-muted-foreground mb-1">
+              Share your card:
+            </span>
+            <div className="flex items-center gap-2">
+              <a
+                href={shareUrl}
+                className="text-primary underline break-all text-sm"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {shareUrl}
+              </a>
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="ml-2 px-2 py-1 rounded bg-primary text-white text-xs hover:bg-primary/80 transition-colors"
+                aria-label="Copy link"
+              >
+                {copied ? "Copied!" : "Copy"}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

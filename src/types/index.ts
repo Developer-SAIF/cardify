@@ -1,3 +1,5 @@
+import { generateShortIdFromUserId } from "@/lib/utils";
+
 export const DEFAULT_PROFILE_PICTURE_URL = "https://placehold.co/150x150.png";
 
 export interface SocialLink {
@@ -79,6 +81,7 @@ export interface ProfessionalDetail {
 
 export interface UserProfile {
   userId: string;
+  shortId: string; // 8-char unique link id
   firstName: string;
   lastName: string;
   headline: string;
@@ -104,6 +107,7 @@ export interface UserProfile {
 
 export const initialProfileData: UserProfile = {
   userId: "12345",
+  shortId: generateShortIdFromUserId("12345"),
   firstName: "Alex",
   lastName: "Johnson",
   headline: "Innovator | Leader | Tech Enthusiast",

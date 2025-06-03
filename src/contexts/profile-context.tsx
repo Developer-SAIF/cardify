@@ -4,6 +4,7 @@ import type { UserProfile } from "@/types";
 import { initialProfileData } from "@/types";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { createContext, useContext, useState, useEffect } from "react";
+import { generateShortIdFromUserId } from "@/lib/utils";
 
 interface ProfileContextType {
   profile: UserProfile | null;
@@ -26,7 +27,11 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
           if (data) {
-            setProfile(data);
+            // Attach shortId to profile context
+            setProfile({
+              ...data,
+              shortId: generateShortIdFromUserId(data.userId),
+            });
           } else {
             localStorage.removeItem("porichoyUserId");
           }
@@ -42,7 +47,7 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
     const res = await fetch(`/api/user/${userId}`);
     if (res.ok) {
       const data = await res.json();
-      setProfile(data);
+      setProfile({ ...data, shortId: generateShortIdFromUserId(data.userId) });
       localStorage.setItem("porichoyUserId", userId);
       setLoading(false);
       return true;

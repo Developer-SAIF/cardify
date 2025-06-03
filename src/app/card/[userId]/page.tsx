@@ -14,30 +14,31 @@ const CardPreview = dynamic(() =>
 
 export default function UserCardPage() {
   const params = useParams();
-  const paramUserIdString =
+  // Accept shortId as param for card page
+  const paramShortIdString =
     params && "userId" in params ? params.userId : undefined;
-  const paramUserId = Array.isArray(paramUserIdString)
-    ? paramUserIdString[0]
-    : paramUserIdString;
+  const paramShortId = Array.isArray(paramShortIdString)
+    ? paramShortIdString[0]
+    : paramShortIdString;
 
   const [cardProfile, setCardProfile] = useState<UserProfile | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
 
   useEffect(() => {
     setPageLoading(true);
-    if (!paramUserId) {
+    if (!paramShortId) {
       setCardProfile(null);
       setPageLoading(false);
       return;
     }
-    // Simulate fetching profile by userId (replace with real API call)
-    if (paramUserId === initialProfileData.userId) {
-      setCardProfile(initialProfileData);
-    } else {
-      setCardProfile(null);
-    }
-    setPageLoading(false);
-  }, [paramUserId]);
+    // Fetch by shortId instead of userId
+    fetch(`/api/user/by-token?shortId=${paramShortId}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        setCardProfile(data);
+        setPageLoading(false);
+      });
+  }, [paramShortId]);
 
   if (pageLoading) {
     return (
