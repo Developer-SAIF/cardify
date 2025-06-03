@@ -23,7 +23,7 @@ export function AppHeader() {
           <img
             src="/logo.png"
             alt="Porichoy Logo"
-            className="h-14 w-14 object-contain"
+            className="h-20 w-20 object-contain" // Increased size
           />
         </Link>
         {/* Spacer to push menu to the right */}
