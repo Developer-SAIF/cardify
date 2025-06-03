@@ -11,7 +11,9 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { SkillsSlider } from "./skills-slider";
 import { useState } from "react";
 
-export function CardPreview() {
+export function CardPreview({
+  hideShareLink = false,
+}: { hideShareLink?: boolean } = {}) {
   const { profile, loading: profileLoading } = useProfile();
 
   if (profileLoading) {
@@ -47,12 +49,13 @@ export function CardPreview() {
     <div className="min-h-screen w-full flex flex-col justify-center items-center py-6 px-2 sm:py-10 sm:px-4 bg-transparent">
       <div
         className={cn(
-          "w-full max-w-lg rounded-3xl shadow-xl overflow-hidden flex flex-col border-4 border-primary bg-background"
+          // Add gradient background, hover effect, and more rounded corners
+          "w-full max-w-lg rounded-[2.2rem] shadow-2xl overflow-hidden flex flex-col border-4 border-primary bg-gradient-to-br from-background via-primary/5 to-background transition-transform hover:scale-[1.015] hover:shadow-3xl duration-200"
         )}
       >
-        <div className="flex flex-col items-stretch p-2 sm:p-4 sm:pt-8 w-full overflow-hidden">
+        <div className="flex flex-col items-stretch p-2 sm:p-5 sm:pt-10 w-full overflow-hidden">
           {/* Cover Photo & Profile Picture Overlap Section */}
-          <div className="relative w-full h-32 sm:h-40 mb-0 rounded-t-3xl overflow-hidden">
+          <div className="relative w-full h-32 sm:h-40 mb-0 rounded-t-[2.2rem] overflow-hidden">
             {profile.coverPhotoUrl && (
               <Image
                 src={profile.coverPhotoUrl}
@@ -70,7 +73,7 @@ export function CardPreview() {
             className="relative w-full flex justify-start"
             style={{ height: 0 }}
           >
-            <div className="absolute left-6 -bottom-12 w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white dark:border-neutral-900 shadow-lg overflow-hidden bg-muted z-10">
+            <div className="absolute left-6 -bottom-14 w-28 h-28 sm:w-36 sm:h-36 rounded-full border-8 border-white dark:border-neutral-900 shadow-2xl overflow-hidden bg-muted z-10 ring-4 ring-primary/20">
               {profile.profilePictureUrl ? (
                 <Image
                   src={profile.profilePictureUrl || DEFAULT_PROFILE_PICTURE_URL}
@@ -81,16 +84,16 @@ export function CardPreview() {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <User className="w-14 h-14 text-muted-foreground/50" />
+                  <User className="w-16 h-16 text-muted-foreground/50" />
                 </div>
               )}
             </div>
           </div>
           {/* Add padding below the profile picture for spacing */}
-          <div className="pt-16 sm:pt-20" />
+          <div className="pt-20 sm:pt-24" />
 
           {/* Name & Headline */}
-          <div className="flex flex-col items-start pl-6 pr-2">
+          <div className="flex flex-col items-start pl-7 pr-3">
             <h1 className="text-2xl sm:text-4xl font-extrabold text-neutral-900 dark:text-white mt-2 tracking-tight break-words">
               {profile.firstName} {profile.lastName}
             </h1>
@@ -103,7 +106,7 @@ export function CardPreview() {
           </div>
 
           {/* Professional & Education Details */}
-          <div className="w-full mt-4 mb-2 pl-6 pr-2">
+          <div className="w-full mt-4 mb-2 pl-7 pr-3">
             <div className="border-l-4 border-primary pl-4 py-2 bg-primary/5 rounded-md">
               {profile.professionalDetails
                 ?.filter((p) => p.isVisible)
@@ -136,7 +139,7 @@ export function CardPreview() {
 
           {/* Skills Slider */}
           {profile.skills.some((s) => s.isVisible) && (
-            <div className="w-full mt-8 pl-6 pr-2">
+            <div className="w-full mt-8 pl-7 pr-3">
               <h3 className="text-xs font-semibold mb-2 uppercase tracking-wider text-primary text-left">
                 Skills
               </h3>
@@ -148,9 +151,12 @@ export function CardPreview() {
             </div>
           )}
 
+          {/* Divider before links */}
+          <div className="w-full border-t border-primary/20 my-6" />
+
           {/* Links with dynamic icons */}
           {profile.links.some((l) => l.isVisible) && (
-            <div className="flex flex-col justify-center gap-2 mt-6 w-full pl-6 pr-2">
+            <div className="flex flex-col justify-center gap-2 mt-2 w-full pl-7 pr-3">
               {profile.links
                 .filter((l) => l.isVisible)
                 .map((link) => {
@@ -161,7 +167,7 @@ export function CardPreview() {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full block px-4 py-2 rounded-md bg-primary text-white hover:bg-primary/90 transition-colors shadow text-base font-semibold overflow-hidden"
+                      className="w-full block px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors shadow text-base font-semibold overflow-hidden border border-primary/30 hover:border-primary/60"
                     >
                       <div className="flex items-center gap-2">
                         <HugeiconsIcon
@@ -182,29 +188,31 @@ export function CardPreview() {
           )}
 
           {/* Shareable Link Section */}
-          <div className="flex flex-col items-center mt-6 mb-2">
-            <span className="text-xs text-muted-foreground mb-1">
-              Share your card:
-            </span>
-            <div className="flex items-center gap-2">
-              <a
-                href={shareUrl}
-                className="text-primary underline break-all text-sm"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {shareUrl}
-              </a>
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="ml-2 px-2 py-1 rounded bg-primary text-white text-xs hover:bg-primary/80 transition-colors"
-                aria-label="Copy link"
-              >
-                {copied ? "Copied!" : "Copy"}
-              </button>
+          {!hideShareLink && (
+            <div className="flex flex-col items-center mt-8 mb-2">
+              <span className="text-xs text-primary font-semibold mb-1 tracking-wide uppercase">
+                Share your card:
+              </span>
+              <div className="flex items-center gap-2 bg-primary/10 rounded px-3 py-1">
+                <a
+                  href={shareUrl}
+                  className="text-primary underline break-all text-sm font-mono"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {shareUrl}
+                </a>
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="ml-2 px-2 py-1 rounded bg-primary text-white text-xs hover:bg-primary/80 transition-colors border border-primary/40"
+                  aria-label="Copy link"
+                >
+                  {copied ? "Copied!" : "Copy"}
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

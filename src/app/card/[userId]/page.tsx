@@ -65,7 +65,7 @@ export default function UserCardPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-100 to-slate-300 dark:from-slate-800 dark:to-slate-900 md:p-0 p-0">
       <div className="w-full max-w-lg">
-        <CardPreview />
+        <CardPreview hideShareLink />
       </div>
     </div>
   );
