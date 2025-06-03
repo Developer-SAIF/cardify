@@ -44,7 +44,7 @@ export default function UserCardPage() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700 p-4 text-white">
         <Loader2 className="h-16 w-16 animate-spin text-accent" />
-        <p className="mt-4 text-xl">Loading Digital Card...</p>
+        <p className="mt-4 text-xl">Loading Porichoy Card...</p>
       </div>
     );
   }
